@@ -1,0 +1,20 @@
+{
+  "status": 100,
+  "msg": "David",
+  
+  "data": {
+    "id": "1",
+    "series": "Bangalore"
+   
+  },
+  "properties": [{
+    "id": "1",
+    "series": "1000-1900"
+  },{
+    "id": "2",
+    "series": "2000-2900"
+  },{
+    "id": "3",
+    "series": "3000-3900"
+  }]
+}
