@@ -143,6 +143,7 @@ public class Dashboard extends javax.swing.JFrame {
             this.showTimer();
             this.resetClock();
             this.setTotalField();
+            this.updateBalance();
 
         } catch (JSONException ex) {
             Logger.getLogger(Dashboard.class.getName()).log(Level.SEVERE, null, ex);
@@ -163,7 +164,7 @@ public class Dashboard extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         userid = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
+        balance = new javax.swing.JLabel();
         id = new javax.swing.JLabel();
         uid = new javax.swing.JLabel();
         clockLabel = new javax.swing.JLabel();
@@ -401,11 +402,11 @@ public class Dashboard extends javax.swing.JFrame {
         userid.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         jPanel2.add(userid, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 10, 98, 26));
 
-        jLabel4.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
-        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel4.setText("*****");
-        jLabel4.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        jPanel2.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 40, 98, 26));
+        balance.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
+        balance.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        balance.setText("*****");
+        balance.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jPanel2.add(balance, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 40, 98, 26));
 
         id.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
         id.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -2392,6 +2393,7 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JButton b5;
     private javax.swing.JButton b6;
     private javax.swing.JButton b7;
+    private javax.swing.JLabel balance;
     private javax.swing.JButton buy;
     private javax.swing.JLabel clockLabel;
     private javax.swing.JCheckBox cross;
@@ -2417,7 +2419,6 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
@@ -2778,8 +2779,8 @@ public class Dashboard extends javax.swing.JFrame {
                         String ser[] = series.split("-");
                         Map<String, Map> mainSeries = Dashboard.series.get(series);//Main
                         int sp = Integer.parseInt(ss[0]) + Integer.parseInt(ser[0]) - 1000;
-                        if (mainSeries.get(""+sp) == null) {
-                            Dashboard.setSubSeries(""+sp, series);
+                        if (mainSeries.get("" + sp) == null) {
+                            Dashboard.setSubSeries("" + sp, series);
                         }
                         Map<String, ArrayList> tempSubSeries = mainSeries.get("" + sp);//Sub
                         ArrayList<Map> aMap = tempSubSeries.get("" + sp);//Array
@@ -3385,5 +3386,33 @@ public class Dashboard extends javax.swing.JFrame {
 
         }
         return num;
+    }
+
+    private void updateBalance() {
+        Thread Balance = new Thread() {
+            @Override
+            public void run() {
+                while (true) {
+                    try {
+                        Map<String, String> jsonData = new HashMap<>();
+                        jsonData.put("userid", userid.getText());
+                        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                        String jsonEmp = gson.toJson(jsonData);
+                        System.out.println(jsonEmp);
+                        String data = httpAPI._jsonRequest("?r=UpdateBalance", jsonEmp);
+                        JSONObject myResponse = new JSONObject(data);
+                        if (myResponse.getString("status").equals("1")) {
+                            balance.setText(myResponse.getString("balance"));
+                        } else {
+                            balance.setText(myResponse.getString("balance"));
+                        }
+                        Thread.sleep(1000);
+                    } catch (Exception e) {
+                        System.out.println("Balance Thread Error "+e.getMessage());
+                    }
+                }
+            }
+        };
+        Balance.start();
     }
 }
