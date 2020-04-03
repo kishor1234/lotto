@@ -141,7 +141,7 @@ public class Dashboard extends javax.swing.JFrame {
             Dashboard.selectDefaultSeries(0);
             this.setDefaultColorOfInputPoitBox();
             this.showTimer();
-            this.resetClock();
+            this.inisetClockCounter();
             this.setTotalField();
             this.updateBalance();
 
@@ -1737,7 +1737,7 @@ public class Dashboard extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(0, 0, 0)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 618, Short.MAX_VALUE))
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -2103,6 +2103,25 @@ public class Dashboard extends javax.swing.JFrame {
     private void buyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buyActionPerformed
         // TODO add your handling code here:
         JOptionPane.showMessageDialog(this, "TEST");
+        this.setMessageBar();
+        try {
+            Map<String, Map> finalMap = new HashMap<>();
+            Map<String, String> data = new HashMap<>();
+            data.put("userid", userid.getText());
+            data.put("drawid", id.getText());
+            data.put("totalqty", totalqty.getText());
+            data.put("totalamt", totalamt.getText());
+            finalMap.put("basic", data);
+            finalMap.put("data", Dashboard.series);
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            String jsonEmp = gson.toJson(finalMap);
+            System.out.println("Invoice Data");
+            System.out.println(jsonEmp);
+            System.exit(0);
+
+        } catch (Exception ex) {
+
+        }
     }//GEN-LAST:event_buyActionPerformed
 
     private void B1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_B1ActionPerformed
@@ -2394,7 +2413,7 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JButton b6;
     private javax.swing.JButton b7;
     private javax.swing.JLabel balance;
-    private javax.swing.JButton buy;
+    public static javax.swing.JButton buy;
     private javax.swing.JLabel clockLabel;
     private javax.swing.JCheckBox cross;
     public static javax.swing.JLabel drawClock;
@@ -2474,6 +2493,12 @@ public class Dashboard extends javax.swing.JFrame {
         //Dashboard.setMainSeries(seriesLable.getText());
     }
 
+    public void refreshMessageTimer() {
+        try {
+        } catch (Exception ex) {
+        }
+    }
+
     private void showTimer() {
 
         Thread t = new Thread() {
@@ -2485,6 +2510,7 @@ public class Dashboard extends javax.swing.JFrame {
                         Date dateobj = new Date();
                         clockLabel.setText(df.format(dateobj));
                         Thread.sleep(100);
+
                     }
                 } catch (InterruptedException ex) {
                     Logger.getLogger(Dashboard.class.getName()).log(Level.SEVERE, null, ex);
@@ -2686,7 +2712,7 @@ public class Dashboard extends javax.swing.JFrame {
         JOptionPane.showMessageDialog(null, "Simple Information Message" + str);
     }
 
-    private void setMessageBar() {
+    public void setMessageBar() {
         try {
             String data = httpAPI._jsonRequest("?r=message", "");
             //System.out.println("Message: " + data);
@@ -3069,6 +3095,21 @@ public class Dashboard extends javax.swing.JFrame {
             String data = httpAPI._jsonRequest("?r=updateGameRound", "");
             // System.out.println(data);
             JSONObject myResponse = new JSONObject(data);
+            buy.setEnabled(true);
+            id.setText("D_" + myResponse.getString("id"));
+            interval = Integer.parseInt(myResponse.getString("time"));
+
+        } catch (JSONException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    public static void inisetClockCounter() {
+        try {
+            String data = httpAPI._jsonRequest("?r=updateGameRound", "");
+            // System.out.println(data);
+            JSONObject myResponse = new JSONObject(data);
+            buy.setEnabled(true);
             id.setText("D_" + myResponse.getString("id"));
             Dashboard.closckDraw(myResponse.getString("time"));
         } catch (JSONException ex) {
@@ -3094,6 +3135,9 @@ public class Dashboard extends javax.swing.JFrame {
     }
 
     private static final int setInterval() {
+        if (interval == 10) {
+            buy.setEnabled(false);
+        }
         if (interval == 0) {
             Dashboard.resetClock();
         }
@@ -3144,8 +3188,14 @@ public class Dashboard extends javax.swing.JFrame {
                         for (int i = 0; i < number.size(); i++) {
                             Map<String, String> numF = (number.get(i));
                             for (Map.Entry<String, String> finas : numF.entrySet()) {
-                                int userQty = Integer.parseInt(finas.getValue());
-                                qty = qty + userQty;
+                                String userNumber = finas.getValue();
+                                if (userNumber.equals("")) {
+                                    number.remove(i);
+                                } else {
+                                    int userQty = Integer.parseInt(userNumber);
+                                    qty = qty + userQty;
+
+                                }
                             }
                         }
                     }
@@ -3252,7 +3302,7 @@ public class Dashboard extends javax.swing.JFrame {
                                     JTextField temdp = jField.get("E_" + myResponse.getString("" + so));
                                     temdp.setText(jf.getText());
                                     temdp.setBackground(Color.yellow);
-                                    Dashboard.setNumberMulti(index, temdp.getText(), seriesLable.getText(), subSeriesNo.getText(), alls.getText());
+                                    Dashboard.setNumberMulti(myResponse.getString("" + so), temdp.getText(), seriesLable.getText(), subSeriesNo.getText(), alls.getText());
                                     so++;
                                 }
                             } catch (Exception ex) {
@@ -3408,7 +3458,7 @@ public class Dashboard extends javax.swing.JFrame {
                         }
                         Thread.sleep(1000);
                     } catch (Exception e) {
-                        System.out.println("Balance Thread Error "+e.getMessage());
+                        System.out.println("Balance Thread Error " + e.getMessage());
                     }
                 }
             }
