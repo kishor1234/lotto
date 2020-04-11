@@ -8,9 +8,12 @@ package GUI;
 import api.httpAPI;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import invoice.claimJSON;
 import invoice.invoiceJSON;
+import invoice.singleResult;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -20,15 +23,22 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.print.DocFlavor;
+import javax.print.PrintService;
+import javax.print.PrintServiceLookup;
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.PrintRequestAttributeSet;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -47,7 +57,7 @@ public class Dashboard extends javax.swing.JFrame {
     private Map<String, JTextField> jField = new HashMap<>();
     private Map<String, JTextField> horizontalTextField = new HashMap<>();
     private Map<String, JTextField> varticalTextField = new HashMap<>();
-    
+
     public String NSystem;
     public static String SelectedSingleSeries;
     public static int LEFT_TO_RIGHT = 1;
@@ -63,12 +73,19 @@ public class Dashboard extends javax.swing.JFrame {
     static Timer timer;
     public static Map<String, Integer> final_Map;
     public static Map<String, JTextField> totalField = new HashMap<>();
-    
+
     public Dashboard(String data) {
         try {
             initComponents();
             advanceDrawArray = new ArrayList<>();
-            NSystems.setVisible(true);
+            NSystems.setVisible(false);
+            subSeriesNo.setVisible(false);
+            alls.setVisible(false);
+            CMulti.setVisible(false);
+            advance.setVisible(false);
+            start.setVisible(false);
+            end.setVisible(false);
+            //id.setVisible(false);
             this.mapButton();
             this.mapJTextField();
             Dashboard.runNSOutput();
@@ -80,7 +97,7 @@ public class Dashboard extends javax.swing.JFrame {
             //System.out.println(myResponse.getString("id"));
             userid.setText(myResponse.getString("userid"));
             id.setText(myResponse.getString("id"));
-            uid.setText(myResponse.getString("id") + " " + myResponse.getString("userid"));
+            uid.setText(myResponse.getString("name") + " " + myResponse.getString("userid"));
 
 //            for (int i = 0; i < 100; i++) {
 //                JTextField jf = jField.get("E_" + i);
@@ -90,14 +107,14 @@ public class Dashboard extends javax.swing.JFrame {
             for (int i = 0; i < 100; i++) {
                 JTextField jf = jField.get("E_" + i);
                 int p = i;
-                
+
                 jf.addKeyListener(new java.awt.event.KeyAdapter() {
-                    
+
                     @Override
                     public void keyReleased(java.awt.event.KeyEvent evt) {
                         //Logger.getLogger(Dashboard.class.getName()).log(Level.SEVERE, null, ex);
                         inputSystem(p, jf);
-                        
+
                     }
                 });
                 jf.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -105,7 +122,7 @@ public class Dashboard extends javax.swing.JFrame {
                     public void mouseClicked(java.awt.event.MouseEvent evt) {
                         lMouseClicked(evt);
                     }
-                    
+
                     private void lMouseClicked(MouseEvent evt) {
                         try {
                             if (!"".equals(jf.getText())) {
@@ -117,10 +134,10 @@ public class Dashboard extends javax.swing.JFrame {
                         }
                     }
                 });
-                
+
                 jf.addFocusListener(new java.awt.event.FocusAdapter() {
                     String focusData = jf.getText();
-                    
+
                     @Override
                     public void focusGained(java.awt.event.FocusEvent evt) {
                         try {
@@ -130,7 +147,7 @@ public class Dashboard extends javax.swing.JFrame {
                             System.out.println(ex.getMessage());
                         }
                     }
-                    
+
                     @Override
                     public void focusLost(java.awt.event.FocusEvent evt) {
                         try {
@@ -145,13 +162,16 @@ public class Dashboard extends javax.swing.JFrame {
                 });
             }
             Dashboard.selectDefaultSeries(0);
-            this.selectSubSeries(B0);
-            this.setDefaultColorOfInputPoitBox();
-            this.showTimer();
-            this.inisetClockCounter();
-            this.setTotalField();
-            this.updateBalance();
-            
+            selectSubSeries(B0);
+            setDefaultColorOfInputPoitBox();
+            showTimer();
+            inisetClockCounter();
+            setTotalField();
+            updateBalance();
+            resultBoard("ALL");
+            setLabelColor();
+            loadPrinter();
+            lastTransaction();
         } catch (JSONException ex) {
             Logger.getLogger(Dashboard.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -166,23 +186,16 @@ public class Dashboard extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jLabel22 = new javax.swing.JLabel();
+        jLabel24 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        userid = new javax.swing.JLabel();
-        balance = new javax.swing.JLabel();
-        id = new javax.swing.JLabel();
         uid = new javax.swing.JLabel();
-        clockLabel = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
+        singout = new javax.swing.JLabel();
+        password = new javax.swing.JLabel();
         seriesLable = new javax.swing.JLabel();
-        jLabel12 = new javax.swing.JLabel();
-        jLabel13 = new javax.swing.JLabel();
-        jLabel14 = new javax.swing.JLabel();
-        drawClock = new javax.swing.JLabel();
+        result = new javax.swing.JLabel();
+        complaint = new javax.swing.JLabel();
         B0 = new javax.swing.JButton();
         jCheckBox1 = new javax.swing.JCheckBox();
         E_0 = new javax.swing.JTextField();
@@ -362,24 +375,49 @@ public class Dashboard extends javax.swing.JFrame {
         end = new javax.swing.JTextField();
         advance = new javax.swing.JTextField();
         jPanel3 = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        drawClock = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        dTime = new javax.swing.JLabel();
+        cDate = new javax.swing.JLabel();
+        account = new javax.swing.JLabel();
+        operator = new javax.swing.JLabel();
+        reprint = new javax.swing.JLabel();
+        cancel = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        balance = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
+        jLabel23 = new javax.swing.JLabel();
+        last = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
-        jPanel7 = new javax.swing.JPanel();
-        jPanel8 = new javax.swing.JPanel();
-        jPanel9 = new javax.swing.JPanel();
-        jPanel10 = new javax.swing.JPanel();
-        jPanel11 = new javax.swing.JPanel();
-        jPanel12 = new javax.swing.JPanel();
+        jLabel25 = new javax.swing.JLabel();
+        lastamt = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
+        printerPanel = new javax.swing.JPanel();
+        printer = new javax.swing.JLabel();
         jPanel13 = new javax.swing.JPanel();
-        jTextField33 = new javax.swing.JTextField();
+        claimReader = new javax.swing.JTextField();
         b1 = new javax.swing.JButton();
         b2 = new javax.swing.JButton();
         b3 = new javax.swing.JButton();
-        b4 = new javax.swing.JButton();
-        b5 = new javax.swing.JButton();
-        b6 = new javax.swing.JButton();
-        b7 = new javax.swing.JButton();
+        bSeries = new javax.swing.JButton();
+        jLabel9 = new javax.swing.JLabel();
+        resultPane = new javax.swing.JPanel();
+        imagePanel = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        jPanel7 = new javax.swing.JPanel();
+        id = new javax.swing.JLabel();
+        userid = new javax.swing.JLabel();
+        jPanel8 = new javax.swing.JPanel();
+        clockLabel = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+
+        jLabel22.setText("jLabel22");
+
+        jLabel24.setText("jLabel24");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -394,83 +432,37 @@ public class Dashboard extends javax.swing.JFrame {
         });
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel1.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Agency");
-        jLabel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        jPanel2.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 10, 98, 26));
-
-        jLabel2.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
-        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel2.setText("Balance");
-        jLabel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        jPanel2.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 40, 98, 26));
-
-        userid.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
-        userid.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        userid.setText("9523");
-        userid.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        jPanel2.add(userid, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 10, 98, 26));
-
-        balance.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
-        balance.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        balance.setText("*****");
-        balance.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        jPanel2.add(balance, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 40, 98, 26));
-
-        id.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
-        id.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        id.setText("D6");
-        id.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        jPanel2.add(id, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 10, 98, 26));
-
         uid.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
         uid.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         uid.setText("D6 9523");
         uid.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        jPanel2.add(uid, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 40, 98, 26));
+        jPanel2.add(uid, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 40, 168, 28));
 
-        clockLabel.setFont(new java.awt.Font("Monospaced", 1, 18)); // NOI18N
-        clockLabel.setForeground(new java.awt.Color(254, 9, 9));
-        clockLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        clockLabel.setText("D6");
-        clockLabel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        jPanel2.add(clockLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 10, 498, 56));
-
-        jLabel8.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
-        jLabel8.setForeground(new java.awt.Color(255, 0, 0));
-        jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel8.setText("Sign Off ");
-        jLabel8.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        jLabel8.addMouseListener(new java.awt.event.MouseAdapter() {
+        singout.setBackground(new java.awt.Color(141, 235, 237));
+        singout.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
+        singout.setForeground(new java.awt.Color(1, 1, 1));
+        singout.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        singout.setText("Sign Off ");
+        singout.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        singout.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jLabel8MouseClicked(evt);
+                singoutMouseClicked(evt);
             }
         });
-        jPanel2.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(1020, 10, 140, 26));
+        jPanel2.add(singout, new org.netbeans.lib.awtextra.AbsoluteConstraints(1060, 10, 100, 26));
 
-        jLabel9.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
-        jLabel9.setForeground(new java.awt.Color(255, 0, 0));
-        jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel9.setText("Change PWD");
-        jLabel9.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        jLabel9.addMouseListener(new java.awt.event.MouseAdapter() {
+        password.setBackground(new java.awt.Color(141, 235, 237));
+        password.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
+        password.setForeground(new java.awt.Color(1, 1, 1));
+        password.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        password.setText("Password");
+        password.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        password.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jLabel9MouseClicked(evt);
+                passwordMouseClicked(evt);
             }
         });
-        jPanel2.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(1020, 40, 140, 26));
-
-        jLabel10.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
-        jLabel10.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel10.setText("Advance Draw Selectory");
-        jLabel10.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        jLabel10.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jLabel10MouseClicked(evt);
-            }
-        });
-        jPanel2.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 70, 210, 26));
+        jPanel2.add(password, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 10, 100, 26));
 
         seriesLable.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
         seriesLable.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -481,32 +473,23 @@ public class Dashboard extends javax.swing.JFrame {
                 seriesLableMouseClicked(evt);
             }
         });
-        jPanel2.add(seriesLable, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 70, 99, 26));
+        jPanel2.add(seriesLable, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 70, 168, 26));
 
-        jLabel12.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
-        jLabel12.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel12.setText("Agency");
-        jLabel12.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        jPanel2.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 70, 208, 26));
+        result.setBackground(new java.awt.Color(141, 235, 237));
+        result.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
+        result.setForeground(new java.awt.Color(1, 1, 1));
+        result.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        result.setText("Result");
+        result.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        jPanel2.add(result, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 10, 120, 26));
 
-        jLabel13.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
-        jLabel13.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel13.setText("AMULTE Weekly Lottery");
-        jLabel13.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        jPanel2.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 70, 288, 26));
-
-        jLabel14.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
-        jLabel14.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel14.setText("Draw Closeing in");
-        jLabel14.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        jPanel2.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 70, 198, 26));
-
-        drawClock.setFont(new java.awt.Font("Monospaced", 1, 20)); // NOI18N
-        drawClock.setForeground(new java.awt.Color(255, 0, 0));
-        drawClock.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        drawClock.setText("00:02:33");
-        drawClock.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        jPanel2.add(drawClock, new org.netbeans.lib.awtextra.AbsoluteConstraints(1020, 70, 140, 26));
+        complaint.setBackground(new java.awt.Color(141, 235, 237));
+        complaint.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
+        complaint.setForeground(new java.awt.Color(1, 1, 1));
+        complaint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        complaint.setText("Complaint");
+        complaint.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        jPanel2.add(complaint, new org.netbeans.lib.awtextra.AbsoluteConstraints(960, 10, 100, 26));
 
         B0.setBackground(new java.awt.Color(255, 255, 255));
         B0.setText("1000-2000");
@@ -518,10 +501,10 @@ public class Dashboard extends javax.swing.JFrame {
         });
         jPanel2.add(B0, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 130, 120, 30));
 
-        jCheckBox1.setBackground(new java.awt.Color(237, 93, 226));
+        jCheckBox1.setBackground(new java.awt.Color(212, 133, 194));
         jCheckBox1.setSelected(true);
         jCheckBox1.setText("2 * 01=0180");
-        jPanel2.add(jCheckBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 130, 130, 30));
+        jPanel2.add(jCheckBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 130, 129, 30));
 
         E_0.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
         E_0.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -584,9 +567,9 @@ public class Dashboard extends javax.swing.JFrame {
         });
         jPanel2.add(B1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 160, 120, 30));
 
-        jCheckBox2.setBackground(new java.awt.Color(70, 176, 216));
+        jCheckBox2.setBackground(new java.awt.Color(130, 180, 126));
         jCheckBox2.setText("2 * 01=0180");
-        jPanel2.add(jCheckBox2, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 160, 130, 30));
+        jPanel2.add(jCheckBox2, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 160, 129, 30));
 
         E_10.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_10.setMinimumSize(new java.awt.Dimension(10, 32));
@@ -676,9 +659,9 @@ public class Dashboard extends javax.swing.JFrame {
         E_29.setMinimumSize(new java.awt.Dimension(10, 32));
         jPanel2.add(E_29, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 190, 60, 30));
 
-        jCheckBox3.setBackground(new java.awt.Color(116, 205, 239));
+        jCheckBox3.setBackground(new java.awt.Color(122, 180, 232));
         jCheckBox3.setText("2 * 02=0360");
-        jPanel2.add(jCheckBox3, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 190, 130, 30));
+        jPanel2.add(jCheckBox3, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 190, 129, 30));
 
         E_23.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_23.setMinimumSize(new java.awt.Dimension(10, 32));
@@ -702,9 +685,9 @@ public class Dashboard extends javax.swing.JFrame {
         E_24.setMinimumSize(new java.awt.Dimension(10, 32));
         jPanel2.add(E_24, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 190, 60, 30));
 
-        jCheckBox4.setBackground(new java.awt.Color(243, 244, 165));
+        jCheckBox4.setBackground(new java.awt.Color(91, 163, 106));
         jCheckBox4.setText("2 * 03=0540");
-        jPanel2.add(jCheckBox4, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 220, 130, 30));
+        jPanel2.add(jCheckBox4, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 220, 129, 30));
 
         B3.setBackground(new java.awt.Color(255, 255, 255));
         B3.setText("1000-2000");
@@ -776,9 +759,9 @@ public class Dashboard extends javax.swing.JFrame {
         });
         jPanel2.add(B4, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 250, 120, 30));
 
-        jCheckBox5.setBackground(new java.awt.Color(165, 232, 123));
+        jCheckBox5.setBackground(new java.awt.Color(217, 141, 129));
         jCheckBox5.setText("2 * 05=0900");
-        jPanel2.add(jCheckBox5, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 250, 130, 30));
+        jPanel2.add(jCheckBox5, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 250, 129, 30));
 
         E_40.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_40.setMinimumSize(new java.awt.Dimension(10, 32));
@@ -849,9 +832,9 @@ public class Dashboard extends javax.swing.JFrame {
         E_50.setMinimumSize(new java.awt.Dimension(10, 32));
         jPanel2.add(E_50, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 280, 60, 30));
 
-        jCheckBox6.setBackground(new java.awt.Color(237, 93, 226));
+        jCheckBox6.setBackground(new java.awt.Color(185, 177, 230));
         jCheckBox6.setText("2 * 05=0900");
-        jPanel2.add(jCheckBox6, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 280, 130, 30));
+        jPanel2.add(jCheckBox6, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 280, 129, 30));
 
         E_56.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_56.setMinimumSize(new java.awt.Dimension(10, 32));
@@ -911,9 +894,9 @@ public class Dashboard extends javax.swing.JFrame {
         E_60.setMinimumSize(new java.awt.Dimension(10, 32));
         jPanel2.add(E_60, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 310, 60, 30));
 
-        jCheckBox7.setBackground(new java.awt.Color(70, 176, 216));
+        jCheckBox7.setBackground(new java.awt.Color(234, 158, 123));
         jCheckBox7.setText("2 * 10=1800");
-        jPanel2.add(jCheckBox7, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 310, 130, 30));
+        jPanel2.add(jCheckBox7, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 310, 129, 30));
 
         E_62.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_62.setMinimumSize(new java.awt.Dimension(10, 32));
@@ -975,9 +958,9 @@ public class Dashboard extends javax.swing.JFrame {
         E_70.setMinimumSize(new java.awt.Dimension(10, 32));
         jPanel2.add(E_70, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 340, 60, 30));
 
-        jCheckBox8.setBackground(new java.awt.Color(116, 205, 239));
+        jCheckBox8.setBackground(new java.awt.Color(164, 204, 90));
         jCheckBox8.setText("2 * 20=3600");
-        jPanel2.add(jCheckBox8, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 340, 130, 30));
+        jPanel2.add(jCheckBox8, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 340, 129, 30));
 
         B7.setBackground(new java.awt.Color(255, 255, 255));
         B7.setText("1000-2000");
@@ -1049,9 +1032,9 @@ public class Dashboard extends javax.swing.JFrame {
         E_87.setMinimumSize(new java.awt.Dimension(10, 32));
         jPanel2.add(E_87, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 370, 60, 30));
 
-        jCheckBox9.setBackground(new java.awt.Color(243, 244, 165));
+        jCheckBox9.setBackground(new java.awt.Color(201, 189, 175));
         jCheckBox9.setText("2 * 25=4500");
-        jPanel2.add(jCheckBox9, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 370, 130, 30));
+        jPanel2.add(jCheckBox9, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 370, 129, 30));
 
         E_86.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_86.setMinimumSize(new java.awt.Dimension(10, 32));
@@ -1115,9 +1098,9 @@ public class Dashboard extends javax.swing.JFrame {
         E_97.setMinimumSize(new java.awt.Dimension(10, 32));
         jPanel2.add(E_97, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 400, 60, 30));
 
-        jCheckBox10.setBackground(new java.awt.Color(165, 232, 123));
+        jCheckBox10.setBackground(new java.awt.Color(23, 188, 189));
         jCheckBox10.setText("2 * 25=4500");
-        jPanel2.add(jCheckBox10, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 400, 130, 30));
+        jPanel2.add(jCheckBox10, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 400, 129, 30));
 
         E_94.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_94.setMinimumSize(new java.awt.Dimension(10, 32));
@@ -1521,251 +1504,300 @@ public class Dashboard extends javax.swing.JFrame {
         advance.setText("false");
         jPanel2.add(advance, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 100, -1, -1));
 
-        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 85, 1170, 500));
+        jPanel3.setBackground(new java.awt.Color(250, 244, 154));
+        jPanel3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jPanel3.setBackground(new java.awt.Color(165, 232, 123));
+        jLabel4.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(216, 43, 43));
+        jLabel4.setText("Dr. Date");
+        jPanel3.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 0, -1, -1));
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
+        drawClock.setFont(new java.awt.Font("Monospaced", 1, 20)); // NOI18N
+        drawClock.setForeground(new java.awt.Color(255, 0, 0));
+        drawClock.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        drawClock.setText("00:02:33");
+        drawClock.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        jPanel3.add(drawClock, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 30, 140, -1));
+
+        jLabel5.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
+        jLabel5.setForeground(new java.awt.Color(216, 43, 43));
+        jLabel5.setText("Time To Dr.");
+        jPanel3.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 0, -1, 20));
+
+        jLabel6.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(216, 43, 43));
+        jLabel6.setText("Dr. Time");
+        jPanel3.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 0, -1, -1));
+
+        dTime.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
+        dTime.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        dTime.setText("03:20 PM");
+        jPanel3.add(dTime, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 30, 110, -1));
+
+        cDate.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
+        cDate.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        cDate.setText("05-01-2020");
+        jPanel3.add(cDate, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 30, 110, -1));
+
+        jPanel2.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 36, 440, 60));
+
+        account.setBackground(new java.awt.Color(141, 235, 237));
+        account.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
+        account.setForeground(new java.awt.Color(1, 1, 1));
+        account.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        account.setText("Account");
+        account.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        jPanel2.add(account, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 10, 120, 26));
+
+        operator.setBackground(new java.awt.Color(141, 235, 237));
+        operator.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
+        operator.setForeground(new java.awt.Color(1, 1, 1));
+        operator.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        operator.setText("Operator");
+        operator.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        jPanel2.add(operator, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 10, 100, 26));
+
+        reprint.setBackground(new java.awt.Color(141, 235, 237));
+        reprint.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
+        reprint.setForeground(new java.awt.Color(1, 1, 1));
+        reprint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        reprint.setText("Reprint");
+        reprint.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        jPanel2.add(reprint, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 10, 100, 26));
+
+        cancel.setBackground(new java.awt.Color(141, 235, 237));
+        cancel.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
+        cancel.setForeground(new java.awt.Color(1, 1, 1));
+        cancel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        cancel.setText("Cancel");
+        cancel.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        jPanel2.add(cancel, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 10, 100, 26));
+
+        jPanel4.setBackground(new java.awt.Color(250, 244, 154));
+        jPanel4.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jPanel4.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel2.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel2.setText("Limit Update");
+        jLabel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 1, 0)));
+        jPanel4.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 120, 26));
+
+        balance.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
+        balance.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        balance.setText("*****");
+        balance.setBorder(javax.swing.BorderFactory.createCompoundBorder());
+        jPanel4.add(balance, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 30, 110, 26));
+
+        jPanel2.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 36, -1, 60));
+
+        jPanel5.setBackground(new java.awt.Color(250, 244, 154));
+        jPanel5.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jPanel5.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel23.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
+        jLabel23.setForeground(new java.awt.Color(216, 43, 43));
+        jLabel23.setText("Last Tr. No");
+        jPanel5.add(jLabel23, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 0, -1, -1));
+
+        last.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
+        last.setForeground(new java.awt.Color(38, 58, 227));
+        last.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        last.setText("ask5e8dc8429f16f");
+        jPanel5.add(last, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 30, 150, 30));
+
+        jPanel2.add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(880, 36, 150, 60));
+
+        jPanel6.setBackground(new java.awt.Color(250, 244, 154));
+        jPanel6.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jPanel6.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel25.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
+        jLabel25.setForeground(new java.awt.Color(216, 43, 43));
+        jLabel25.setText("Last Sale Amt.");
+        jPanel6.add(jLabel25, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 0, -1, -1));
+
+        lastamt.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
+        lastamt.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lastamt.setText("Rs. 60.00");
+        jPanel6.add(lastamt, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 30, 130, -1));
+
+        jPanel2.add(jPanel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 36, 130, 60));
+
+        jButton1.setBackground(new java.awt.Color(227, 227, 62));
+        jButton1.setText("Result Update");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        jPanel2.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 0, 170, 40));
+
+        printerPanel.setBackground(new java.awt.Color(255, 255, 255));
+        printerPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Select Printer"));
+
+        javax.swing.GroupLayout printerPanelLayout = new javax.swing.GroupLayout(printerPanel);
+        printerPanel.setLayout(printerPanelLayout);
+        printerPanelLayout.setHorizontalGroup(
+            printerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(printer, javax.swing.GroupLayout.DEFAULT_SIZE, 126, Short.MAX_VALUE)
         );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 70, Short.MAX_VALUE)
-        );
-
-        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 30, -1, 70));
-
-        jPanel4.setBackground(new java.awt.Color(237, 93, 226));
-
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 70, Short.MAX_VALUE)
-        );
-
-        jPanel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 30, -1, 70));
-
-        jPanel5.setBackground(new java.awt.Color(70, 176, 216));
-
-        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-        jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 70, Short.MAX_VALUE)
-        );
-
-        jPanel1.add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 30, -1, 70));
-
-        jPanel6.setBackground(new java.awt.Color(116, 205, 239));
-
-        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
-        jPanel6.setLayout(jPanel6Layout);
-        jPanel6Layout.setHorizontalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-        jPanel6Layout.setVerticalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 70, Short.MAX_VALUE)
-        );
-
-        jPanel1.add(jPanel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 30, -1, 70));
-
-        jPanel7.setBackground(new java.awt.Color(243, 244, 165));
-
-        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
-        jPanel7.setLayout(jPanel7Layout);
-        jPanel7Layout.setHorizontalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-        jPanel7Layout.setVerticalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 70, Short.MAX_VALUE)
-        );
-
-        jPanel1.add(jPanel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 30, -1, 70));
-
-        jPanel8.setBackground(new java.awt.Color(237, 93, 226));
-
-        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
-        jPanel8.setLayout(jPanel8Layout);
-        jPanel8Layout.setHorizontalGroup(
-            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-        jPanel8Layout.setVerticalGroup(
-            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 70, Short.MAX_VALUE)
-        );
-
-        jPanel1.add(jPanel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 30, -1, 70));
-
-        jPanel9.setBackground(new java.awt.Color(70, 176, 216));
-
-        javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
-        jPanel9.setLayout(jPanel9Layout);
-        jPanel9Layout.setHorizontalGroup(
-            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-        jPanel9Layout.setVerticalGroup(
-            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 70, Short.MAX_VALUE)
-        );
-
-        jPanel1.add(jPanel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(770, 30, -1, 70));
-
-        jPanel10.setBackground(new java.awt.Color(116, 205, 239));
-
-        javax.swing.GroupLayout jPanel10Layout = new javax.swing.GroupLayout(jPanel10);
-        jPanel10.setLayout(jPanel10Layout);
-        jPanel10Layout.setHorizontalGroup(
-            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-        jPanel10Layout.setVerticalGroup(
-            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 70, Short.MAX_VALUE)
-        );
-
-        jPanel1.add(jPanel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(870, 30, -1, 70));
-
-        jPanel11.setBackground(new java.awt.Color(243, 244, 165));
-
-        javax.swing.GroupLayout jPanel11Layout = new javax.swing.GroupLayout(jPanel11);
-        jPanel11.setLayout(jPanel11Layout);
-        jPanel11Layout.setHorizontalGroup(
-            jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-        jPanel11Layout.setVerticalGroup(
-            jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 70, Short.MAX_VALUE)
-        );
-
-        jPanel1.add(jPanel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(970, 30, -1, 70));
-
-        jPanel12.setBackground(new java.awt.Color(165, 232, 123));
-
-        javax.swing.GroupLayout jPanel12Layout = new javax.swing.GroupLayout(jPanel12);
-        jPanel12.setLayout(jPanel12Layout);
-        jPanel12Layout.setHorizontalGroup(
-            jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
-        );
-        jPanel12Layout.setVerticalGroup(
-            jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 70, Short.MAX_VALUE)
+        printerPanelLayout.setVerticalGroup(
+            printerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, printerPanelLayout.createSequentialGroup()
+                .addGap(0, 54, Short.MAX_VALUE)
+                .addComponent(printer, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
-        jPanel1.add(jPanel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(1070, 30, -1, 70));
+        jPanel2.add(printerPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 138, 95));
+
+        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 100, 1170, 500));
 
         jPanel13.setBackground(new java.awt.Color(255, 255, 255));
         jPanel13.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jPanel13.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        claimReader.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                claimReaderKeyReleased(evt);
+            }
+        });
+        jPanel13.add(claimReader, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 5, 163, 35));
 
         b1.setBackground(new java.awt.Color(109, 106, 225));
         b1.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
         b1.setForeground(new java.awt.Color(254, 254, 254));
-        b1.setText("REFRESH[F8]");
+        b1.setText("ADVANCE DRAW");
         b1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 b1ActionPerformed(evt);
             }
         });
+        jPanel13.add(b1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 5, 170, 35));
 
         b2.setBackground(new java.awt.Color(109, 106, 225));
         b2.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
         b2.setForeground(new java.awt.Color(254, 254, 254));
-        b2.setText("REPAINT[F3]");
+        b2.setText("REFRESH");
         b2.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         b2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 b2ActionPerformed(evt);
             }
         });
+        jPanel13.add(b2, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 5, 110, 35));
 
         b3.setBackground(new java.awt.Color(109, 106, 225));
         b3.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
         b3.setForeground(new java.awt.Color(254, 254, 254));
         b3.setText("REPORT[F4]");
         b3.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        b3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                b3ActionPerformed(evt);
+            }
+        });
+        jPanel13.add(b3, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 5, 130, 35));
 
-        b4.setBackground(new java.awt.Color(109, 106, 225));
-        b4.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
-        b4.setForeground(new java.awt.Color(254, 254, 254));
-        b4.setText("PAY[F12]");
-        b4.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        bSeries.setBackground(new java.awt.Color(109, 106, 225));
+        bSeries.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
+        bSeries.setForeground(new java.awt.Color(254, 254, 254));
+        bSeries.setText("SERIES");
+        bSeries.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        bSeries.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bSeriesActionPerformed(evt);
+            }
+        });
+        jPanel13.add(bSeries, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 5, 110, 35));
 
-        b5.setBackground(new java.awt.Color(109, 106, 225));
-        b5.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
-        b5.setForeground(new java.awt.Color(254, 254, 254));
-        b5.setText("REPORT");
-        b5.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/mobile-phone-signal-strength.png"))); // NOI18N
+        jPanel13.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(1110, 0, 48, 43));
 
-        b6.setBackground(new java.awt.Color(109, 106, 225));
-        b6.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
-        b6.setForeground(new java.awt.Color(254, 254, 254));
-        b6.setText("CASH CARD");
-        b6.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        jPanel1.add(jPanel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 600, 1170, 45));
 
-        b7.setBackground(new java.awt.Color(109, 106, 225));
-        b7.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
-        b7.setForeground(new java.awt.Color(254, 254, 254));
-        b7.setText("CANCEL [12]");
-        b7.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        resultPane.setBackground(new java.awt.Color(254, 254, 254));
+        resultPane.setAutoscrolls(true);
 
-        javax.swing.GroupLayout jPanel13Layout = new javax.swing.GroupLayout(jPanel13);
-        jPanel13.setLayout(jPanel13Layout);
-        jPanel13Layout.setHorizontalGroup(
-            jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel13Layout.createSequentialGroup()
-                .addGap(9, 9, 9)
-                .addComponent(b1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(b2, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(b3, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(b4, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(b6, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(b7, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(b5, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(26, 26, 26)
-                .addComponent(jTextField33, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
+        javax.swing.GroupLayout resultPaneLayout = new javax.swing.GroupLayout(resultPane);
+        resultPane.setLayout(resultPaneLayout);
+        resultPaneLayout.setHorizontalGroup(
+            resultPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 830, Short.MAX_VALUE)
+        );
+        resultPaneLayout.setVerticalGroup(
+            resultPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
+
+        jPanel1.add(resultPane, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 0, 830, 100));
+
+        imagePanel.setBackground(new java.awt.Color(255, 255, 255));
+
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/rajashri4.png"))); // NOI18N
+        jLabel3.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+
+        javax.swing.GroupLayout imagePanelLayout = new javax.swing.GroupLayout(imagePanel);
+        imagePanel.setLayout(imagePanelLayout);
+        imagePanelLayout.setHorizontalGroup(
+            imagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, imagePanelLayout.createSequentialGroup()
+                .addContainerGap(24, Short.MAX_VALUE)
+                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(24, 24, 24))
+        );
+        imagePanelLayout.setVerticalGroup(
+            imagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, imagePanelLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel3)
                 .addContainerGap())
         );
-        jPanel13Layout.setVerticalGroup(
-            jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel13Layout.createSequentialGroup()
-                .addGap(7, 7, 7)
-                .addGroup(jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(b1)
-                    .addComponent(b2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(b3, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(b4, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(b6, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(b7, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(b5, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField33, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
-        );
 
-        jPanel1.add(jPanel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 585, 1170, 45));
+        jPanel1.add(imagePanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 150, 100));
+
+        jPanel7.setBackground(new java.awt.Color(234, 47, 50));
+        jPanel7.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        id.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
+        id.setForeground(new java.awt.Color(255, 255, 255));
+        id.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        id.setText("D_49");
+        id.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        jPanel7.add(id, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 70, 20));
+
+        userid.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
+        userid.setForeground(new java.awt.Color(255, 255, 255));
+        userid.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        userid.setText("9523");
+        userid.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        jPanel7.add(userid, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 0, 80, 20));
+
+        jPanel1.add(jPanel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 50, 190, 20));
+
+        jPanel8.setBackground(new java.awt.Color(244, 188, 64));
+        jPanel8.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        clockLabel.setFont(new java.awt.Font("Monospaced", 1, 18)); // NOI18N
+        clockLabel.setForeground(new java.awt.Color(4, 2, 2));
+        clockLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        clockLabel.setText("D6");
+        clockLabel.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        jPanel8.add(clockLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 20, 190, 30));
+
+        jLabel1.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
+        jLabel1.setText("Rajalaxmi Lottery");
+        jPanel8.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 0, -1, -1));
+
+        jPanel1.add(jPanel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 0, 190, 50));
+
+        jLabel8.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
+        jLabel8.setForeground(new java.awt.Color(254, 254, 254));
+        jLabel8.setText("Software Version 1.0");
+        jPanel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 70, -1, 30));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -1875,17 +1907,17 @@ public class Dashboard extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_fixedActionPerformed
 
-    private void jLabel8MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel8MouseClicked
+    private void singoutMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_singoutMouseClicked
         // TODO add your handling code here:
         this.setVisible(false);
         new Login().setVisible(true);
-    }//GEN-LAST:event_jLabel8MouseClicked
+    }//GEN-LAST:event_singoutMouseClicked
 
-    private void jLabel9MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel9MouseClicked
+    private void passwordMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_passwordMouseClicked
         // TODO add your handling code here:
         new ChangePassword().setVisible(true);
         ChangePassword.id.setText(userid.getText());
-    }//GEN-LAST:event_jLabel9MouseClicked
+    }//GEN-LAST:event_passwordMouseClicked
 
     private void seriesLableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_seriesLableMouseClicked
         // TODO add your handling code here:
@@ -1936,7 +1968,7 @@ public class Dashboard extends javax.swing.JFrame {
                     temp.setEnabled(true);
                 }
                 i++;
-                
+
             }
         }
     }//GEN-LAST:event_evenItemStateChanged
@@ -2146,76 +2178,92 @@ public class Dashboard extends javax.swing.JFrame {
         // TODO add your handling code here:
         //JOptionPane.showMessageDialog(this, "TEST");
         this.setMessageBar();
-        String msg = "";
+
         try {
-            String qt = totalqty.getText();
-            String am = totalamt.getText();
-            if (qt.equals("") && am.equals("")) {
-                qt = "0";
-                am = "0";
-            }
-            if (Integer.parseInt(qt) <= 0 && Integer.parseInt(am) <= 0) {
-                JOptionPane.showMessageDialog(this, "Please fill lottry point");
-                
-            } else {
-                
-                if (advance.getText().equals("true")) {
-                    for (int i = 0; i < Dashboard.advanceDrawArray.size(); i++) {
-                        Map<String, String> advanceDraw = Dashboard.advanceDrawArray.get(i);
-                        Map<String, Map> finalMap = new HashMap<>();
-                        Map<String, String> data = new HashMap<>();
-                        data.put("userid", userid.getText());
-                        
-                        data.put("drawid", advanceDraw.get("gametimeid"));
-                        data.put("totalqty", totalqty.getText());
-                        data.put("totalamt", totalamt.getText());
-                        data.put("perPoint", "2");
-                        data.put("start", advanceDraw.get("gametime"));
-                        data.put("end", advanceDraw.get("gameendtime"));
-                        data.put("ip", "127.0.0.1");
-                        finalMap.put("basic", data);
-                        finalMap.put("data", Dashboard.series);
-                        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                        String jsonEmp = gson.toJson(finalMap);
-                        System.out.println(jsonEmp);
-                        System.exit(0);
-                        String Data = httpAPI._jsonRequest("?r=invoice", jsonEmp);
-                        //System.out.println("Data \n" + Data);
-                        msg = invoiceJSON.invoiceJSONPrint(Data);
-                        
+            Thread t = new Thread() {
+                String msg = "";
+
+                @Override
+                public void run() {
+                    try {
+                        String qt = totalqty.getText();
+                        String am = totalamt.getText();
+                        if (qt.equals("") && am.equals("")) {
+                            qt = "0";
+                            am = "0";
+                        }
+                        if (Integer.parseInt(qt) <= 0 && Integer.parseInt(am) <= 0) {
+                            JOptionPane.showMessageDialog(null, "Please fill lottry point");
+
+                        } else {
+
+                            if (advance.getText().equals("true")) {
+                                for (int i = 0; i < Dashboard.advanceDrawArray.size(); i++) {
+                                    Map<String, String> advanceDraw = Dashboard.advanceDrawArray.get(i);
+                                    Map<String, Map> finalMap = new HashMap<>();
+                                    Map<String, String> data = new HashMap<>();
+                                    data.put("userid", userid.getText());
+
+                                    data.put("drawid", advanceDraw.get("gametimeid"));
+                                    data.put("totalqty", totalqty.getText());
+                                    data.put("totalamt", totalamt.getText());
+                                    data.put("perPoint", "2");
+                                    data.put("start", advanceDraw.get("gametime"));
+                                    data.put("end", advanceDraw.get("gameendtime"));
+                                    data.put("ip", "127.0.0.1");
+                                    finalMap.put("basic", data);
+                                    finalMap.put("data", Dashboard.series);
+                                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                                    String jsonEmp = gson.toJson(finalMap);
+                                    System.out.println(jsonEmp);
+
+                                    String Data = httpAPI._jsonRequest("?r=invoice", jsonEmp);
+                                    //System.out.println("Data \n" + Data);
+                                    msg = invoiceJSON.invoiceJSONPrint(Data);
+                                    lastTransaction();
+                                }
+                            } else {
+                                Map<String, Map> finalMap = new HashMap<>();
+                                Map<String, String> data = new HashMap<>();
+                                data.put("userid", userid.getText());
+                                String did[] = id.getText().split("_");
+                                data.put("drawid", did[1]);
+                                data.put("totalqty", totalqty.getText());
+                                data.put("totalamt", totalamt.getText());
+                                data.put("perPoint", "2");
+                                data.put("start", start.getText());
+                                data.put("end", end.getText());
+                                data.put("ip", "127.0.0.1");
+                                finalMap.put("basic", data);
+                                finalMap.put("data", Dashboard.series);
+                                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                                String jsonEmp = gson.toJson(finalMap);
+                                System.out.println(jsonEmp);
+                                String Data = httpAPI._jsonRequest("?r=invoice", jsonEmp);
+                                System.out.println("Data \n" + Data);
+                                invoiceJSON.invoiceJSONPrint(Data);
+                                msg = invoiceJSON.invoiceJSONPrint(Data);
+                                lastTransaction();
+
+                            }
+
+                            JOptionPane.showMessageDialog(null, msg);
+
+                        }
+
+                        resetAll();
+                        buy.setEnabled(true);
+                    } catch (Exception ex) {
+                        System.out.println(ex.getMessage());
                     }
-                } else {
-                    Map<String, Map> finalMap = new HashMap<>();
-                    Map<String, String> data = new HashMap<>();
-                    data.put("userid", userid.getText());
-                    String did[] = id.getText().split("_");
-                    data.put("drawid", did[1]);
-                    data.put("totalqty", totalqty.getText());
-                    data.put("totalamt", totalamt.getText());
-                    data.put("perPoint", "2");
-                    data.put("start", start.getText());
-                    data.put("end", end.getText());
-                    data.put("ip", "127.0.0.1");
-                    finalMap.put("basic", data);
-                    finalMap.put("data", Dashboard.series);
-                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                    String jsonEmp = gson.toJson(finalMap);
-                    System.out.println(jsonEmp);
-                    String Data = httpAPI._jsonRequest("?r=invoice", jsonEmp);
-                    System.out.println("Data \n" + Data);
-                    invoiceJSON.invoiceJSONPrint(Data);
-                    msg = invoiceJSON.invoiceJSONPrint(Data);
-                    
                 }
-                
-                JOptionPane.showMessageDialog(this, msg);
-                
-            }
-            this.resetAll();
-            
+            };
+            buy.setEnabled(false);
+            t.start();
+
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Exception message " + ex.getMessage());
-            
+
         }
     }//GEN-LAST:event_buyActionPerformed
 
@@ -2336,24 +2384,74 @@ public class Dashboard extends javax.swing.JFrame {
         JOptionPane.showMessageDialog(this, evt.getKeyChar());
     }//GEN-LAST:event_jPanel2KeyReleased
 
-    private void jLabel10MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel10MouseClicked
-        // TODO add your handling code here:
-        new advance().setVisible(true);
-    }//GEN-LAST:event_jLabel10MouseClicked
-
     private void b1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b1ActionPerformed
         // TODO add your handling code here:
-        resetAll();
+        new advance().setVisible(true);
     }//GEN-LAST:event_b1ActionPerformed
 
     private void b2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b2ActionPerformed
         // TODO add your handling code here:
+        resultBoard("ALL");
         resetAll();
     }//GEN-LAST:event_b2ActionPerformed
 
     private void B_0ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_B_0ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_B_0ActionPerformed
+
+    private void claimReaderKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_claimReaderKeyReleased
+        // TODO add your handling code here:
+        if (evt.getKeyCode() == 10) {
+            Thread t = new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        Map<String, String> finalMap = new HashMap<>();
+                        finalMap.put("id", claimReader.getText());
+                        finalMap.put("userid", userid.getText());
+                        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                        String jsonEmp = gson.toJson(finalMap);
+                        System.out.println(jsonEmp);
+                        String data = httpAPI._jsonRequest("?r=checkWinner", jsonEmp);
+                        System.out.println(data);
+                        String msg = claimJSON.claimJSONPrint(data);
+                        JOptionPane.showMessageDialog(null, msg);
+                        claimReader.setText("");
+                    } catch (Exception ex) {
+                        System.out.println("Error on ClaimReadr Exceptione " + ex.getMessage());
+                    }
+                }
+            };
+            t.start();
+        }
+    }//GEN-LAST:event_claimReaderKeyReleased
+
+    private void b3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b3ActionPerformed
+        // TODO add your handling code here:
+
+    }//GEN-LAST:event_b3ActionPerformed
+
+    private void bSeriesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bSeriesActionPerformed
+        // TODO add your handling code here:
+        new series().setVisible(true);
+    }//GEN-LAST:event_bSeriesActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        try{
+            if(multi.isSelected())
+            {
+                //call default
+                 resultBoard("ALL");
+            }else{
+                /// single display
+                resultBoard(seriesLable.getText());
+            }
+        }catch(Exception ed)
+        {
+            
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -2545,24 +2643,29 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JTextField Q7000_7900;
     private javax.swing.JTextField Q8000_8900;
     private javax.swing.JTextField Q9000_9900;
+    private javax.swing.JLabel account;
     public static javax.swing.JTextField advance;
     private javax.swing.JTextField alls;
     private javax.swing.JButton b1;
     private javax.swing.JButton b2;
     private javax.swing.JButton b3;
-    private javax.swing.JButton b4;
-    private javax.swing.JButton b5;
-    private javax.swing.JButton b6;
-    private javax.swing.JButton b7;
+    private javax.swing.JButton bSeries;
     private javax.swing.JLabel balance;
     public static javax.swing.JButton buy;
+    private javax.swing.JLabel cDate;
+    private javax.swing.JLabel cancel;
+    private javax.swing.JTextField claimReader;
     private javax.swing.JLabel clockLabel;
+    private javax.swing.JLabel complaint;
     private javax.swing.JCheckBox cross;
+    public static javax.swing.JLabel dTime;
     public static javax.swing.JLabel drawClock;
     public static javax.swing.JTextField end;
     private javax.swing.JCheckBox even;
     private javax.swing.JCheckBox fixed;
     public static javax.swing.JLabel id;
+    private javax.swing.JPanel imagePanel;
+    private javax.swing.JButton jButton1;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JCheckBox jCheckBox10;
     private javax.swing.JCheckBox jCheckBox2;
@@ -2574,20 +2677,21 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JCheckBox jCheckBox8;
     private javax.swing.JCheckBox jCheckBox9;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel22;
+    private javax.swing.JLabel jLabel23;
+    private javax.swing.JLabel jLabel24;
+    private javax.swing.JLabel jLabel25;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel10;
-    private javax.swing.JPanel jPanel11;
-    private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -2596,11 +2700,19 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
-    private javax.swing.JPanel jPanel9;
-    private javax.swing.JTextField jTextField33;
+    private javax.swing.JLabel last;
+    private javax.swing.JLabel lastamt;
     public static final javax.swing.JCheckBox multi = new javax.swing.JCheckBox();
     private javax.swing.JCheckBox odd;
+    private javax.swing.JLabel operator;
+    private javax.swing.JLabel password;
+    public static javax.swing.JLabel printer;
+    private javax.swing.JPanel printerPanel;
+    private javax.swing.JLabel reprint;
+    private javax.swing.JLabel result;
+    public static javax.swing.JPanel resultPane;
     public static javax.swing.JLabel seriesLable;
+    private javax.swing.JLabel singout;
     public static javax.swing.JTextField start;
     private javax.swing.JTextField subSeriesNo;
     public static javax.swing.JTextField totalamt;
@@ -2612,7 +2724,7 @@ public class Dashboard extends javax.swing.JFrame {
     public static void selectDefaultSeries(int i) {
         ArrayList<String> temp = new ArrayList<>();
         temp = SeriesClass.series.get(i);
-        
+
         Iterator litr = temp.listIterator();
         int k = 0;
         while (litr.hasNext()) {
@@ -2622,11 +2734,11 @@ public class Dashboard extends javax.swing.JFrame {
         }
         Dashboard.setMainSeries(seriesLable.getText());
     }
-    
+
     public static void selectDefaultSeriesMulti(int i) {
         ArrayList<String> temp = new ArrayList<>();
         temp = SeriesClass.series.get(i);
-        
+
         Iterator litr = temp.listIterator();
         int k = 0;
         while (litr.hasNext()) {
@@ -2636,25 +2748,28 @@ public class Dashboard extends javax.swing.JFrame {
         }
         //Dashboard.setMainSeries(seriesLable.getText());
     }
-    
+
     public void refreshMessageTimer() {
         try {
         } catch (Exception ex) {
         }
     }
-    
+
     private void showTimer() {
-        
+
         Thread t = new Thread() {
             @Override
             public void run() {
                 try {
+                    DateFormat f = new SimpleDateFormat("dd-MM-YYYY");
+                    Date dobj = new Date();
+                    cDate.setText(f.format(dobj));
                     while (true) {
-                        DateFormat df = new SimpleDateFormat("EEEE, dd-MMM-YYYY hh:mm:ss aa");
+                        DateFormat df = new SimpleDateFormat("hh:mm:ss aa");
                         Date dateobj = new Date();
                         clockLabel.setText(df.format(dateobj));
                         Thread.sleep(100);
-                        
+
                     }
                 } catch (InterruptedException ex) {
                     Logger.getLogger(Dashboard.class.getName()).log(Level.SEVERE, null, ex);
@@ -2664,7 +2779,7 @@ public class Dashboard extends javax.swing.JFrame {
         t.start();
         //System.out.println();
     }
-    
+
     private void mapButton() {
         try {
             buttonMap.put("B0", B0);
@@ -2678,10 +2793,10 @@ public class Dashboard extends javax.swing.JFrame {
             buttonMap.put("B8", B8);
             buttonMap.put("B9", B9);
         } catch (Exception ex) {
-            
+
         }
     }
-    
+
     private void mapHorizontalTextField() {
         try {
             horizontalTextField.put("B_0", B_0);
@@ -2698,7 +2813,7 @@ public class Dashboard extends javax.swing.JFrame {
             System.out.println(ex.getMessage());
         }
     }
-    
+
     public void setTotalField() {
         try {
             totalField.put("Q1000_1900", Q1000_1900);
@@ -2721,12 +2836,12 @@ public class Dashboard extends javax.swing.JFrame {
             totalField.put("A9000_9900", A9000_9900);
             totalField.put("Q10000_10900", Q10000_10900);
             totalField.put("A10000_10900", A10000_10900);
-            
+
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
     }
-    
+
     private void mapVarticalTextField() {
         try {
             varticalTextField.put("I_0", I_0);
@@ -2743,7 +2858,7 @@ public class Dashboard extends javax.swing.JFrame {
             System.out.println(ex.getMessage());
         }
     }
-    
+
     private void mapJTextField() {
         try {
             jField.put("E_0", E_0);
@@ -2847,15 +2962,15 @@ public class Dashboard extends javax.swing.JFrame {
             jField.put("E_98", E_98);
             jField.put("E_99", E_99);
         } catch (Exception ex) {
-            
+
         }
     }
-    
+
     public void actionPerformed(ActionEvent ae) {
         String str = ae.getActionCommand();
         JOptionPane.showMessageDialog(null, "Simple Information Message" + str);
     }
-    
+
     public void setMessageBar() {
         try {
             String data = httpAPI._jsonRequest("?r=message", "");
@@ -2864,22 +2979,22 @@ public class Dashboard extends javax.swing.JFrame {
             myLable.setForeground(Color.red);
             myLable.setBounds(10, 460, 800, 30);
             jPanel2.add(myLable);
-            
+
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
     }
-    
+
     public static void setMainSeries(String Series) {
         Map<String, Map> tempSeries = new HashMap<>();
         Dashboard.series.put(Series, tempSeries);
     }
-    
+
     public static void removeMainSeries(String Series) {
         //Map<String, Map> tempSeries = new HashMap<>();
         Dashboard.series.remove(Series);
     }
-    
+
     public static void setSubSeries(String subSeries, String Main) {//Mian=1000-1900
         try {
             System.out.println(Main);
@@ -2892,9 +3007,9 @@ public class Dashboard extends javax.swing.JFrame {
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
-        
+
     }
-    
+
     public static final void setNumber(String index, String value, String Main, String Sub) {
         try {
             // Map<String, Map> mainSeries = Dashboard.series.get(Main);//Main
@@ -2917,7 +3032,7 @@ public class Dashboard extends javax.swing.JFrame {
                             flag = true;
                         }
                     }
-                    
+
                 }
                 if (!flag) {
                     Map<String, String> number = new HashMap<>();
@@ -2934,9 +3049,9 @@ public class Dashboard extends javax.swing.JFrame {
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
-        
+
     }
-    
+
     public static final void setNumberMulti(String index, String value, String Main, String Sub, String state) {
         try {
             for (String series : Dashboard.multiSeries) {
@@ -2949,7 +3064,7 @@ public class Dashboard extends javax.swing.JFrame {
                         if (mainSeries.get(sp) == null) {
                             Dashboard.setSubSeries(sp, series);
                         }
-                        
+
                         Map<String, ArrayList> tempSubSeries = mainSeries.get(sp);//Sub
                         ArrayList<Map> aMap = tempSubSeries.get(sp);//Array
                         boolean flag = false;
@@ -2961,14 +3076,14 @@ public class Dashboard extends javax.swing.JFrame {
                                     flag = true;
                                 }
                             }
-                            
+
                         }
                         if (!flag) {
                             Map<String, String> number = new HashMap<>();
                             number.put(index, value);
                             aMap.add(number);
                         }
-                        
+
                     }
                 } else {
                     for (String seriess : Dashboard.multiSeries) {
@@ -2990,7 +3105,7 @@ public class Dashboard extends javax.swing.JFrame {
                                     flag = true;
                                 }
                             }
-                            
+
                         }
                         if (!flag) {
                             Map<String, String> number = new HashMap<>();
@@ -3000,13 +3115,13 @@ public class Dashboard extends javax.swing.JFrame {
                     }
                 }
             }
-            
+
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
-        
+
     }
-    
+
     public static <T> ArrayList<T> removeDuplicates(ArrayList<T> list) {
 
         // Create a new ArrayList 
@@ -3018,7 +3133,7 @@ public class Dashboard extends javax.swing.JFrame {
             // If this element is not present in newList 
             // then add it 
             if (!newList.contains(element)) {
-                
+
                 newList.add(element);
             }
         }
@@ -3026,11 +3141,11 @@ public class Dashboard extends javax.swing.JFrame {
         // return the new list 
         return newList;
     }
-    
+
     public static void runNSOutput() {
         try {
             Thread t = new Thread() {
-                
+
                 @Override
                 public void run() {
 //                    while (true) {
@@ -3042,13 +3157,13 @@ public class Dashboard extends javax.swing.JFrame {
 //                        }
 //                    }
                     // System.out.println(Dashboard.series);
-                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                    //Gson gson = new GsonBuilder().setPrettyPrinting().create();
                     while (true) {
-                        String jsonEmp = gson.toJson(Dashboard.multiSeries);
-                        System.out.println(jsonEmp);
+                        //  String jsonEmp = gson.toJson(Dashboard.multiSeries);
+                        // System.out.println(jsonEmp);
                         //System.out.println(advanceDrawArray);
                         Dashboard.calculateTotal();
-                        
+
                         try {
                             Thread.sleep(1000);
                             Dashboard.resetFinalTotal();
@@ -3063,7 +3178,7 @@ public class Dashboard extends javax.swing.JFrame {
             System.out.println(ex.getMessage());
         }
     }
-    
+
     private void BulkNumberWrite(int i, String p, java.awt.event.KeyEvent e) {
         // System.out.println(e.getKeyCode());
         switch (e.getKeyCode()) {
@@ -3111,9 +3226,9 @@ public class Dashboard extends javax.swing.JFrame {
                 }
                 break;
         }
-        
+
     }
-    
+
     private void BulkNumberWriteVartical(int i, String p, KeyEvent e) {
         // System.out.println(e.getKeyCode());
         switch (e.getKeyCode()) {
@@ -3123,7 +3238,7 @@ public class Dashboard extends javax.swing.JFrame {
                     JTextField tpf = varticalTextField.get("I_" + tempN);
                     tpf.requestFocus();
                 }
-                
+
                 break;
             case 40:
                 int tempP = i + 10;
@@ -3161,9 +3276,9 @@ public class Dashboard extends javax.swing.JFrame {
                 }
                 break;
         }
-        
+
     }
-    
+
     public final void setDefaultColorOfInputPoitBox() {
         try {
             int i = 0;
@@ -3178,18 +3293,18 @@ public class Dashboard extends javax.swing.JFrame {
             System.out.println(e.getMessage());
         }
     }
-    
+
     private void selectSubSeries(JButton B0) {
         String btxt = B0.getText();
         subSeriesNo.setText(btxt);
         if (Dashboard.checkSubSeries(btxt, seriesLable.getText())) {
-            
+
         } else {
             Dashboard.setSubSeries(btxt, seriesLable.getText());
         }
-        
+
         String s[] = btxt.split("-");
-        
+
         int end = Integer.parseInt(s[1]);
         int i = 0;
         for (int start = Integer.parseInt(s[0]); start <= end; start++) {
@@ -3202,7 +3317,7 @@ public class Dashboard extends javax.swing.JFrame {
             i++;
         }
     }
-    
+
     private void setDefauldButtonColor() {
         B0.setBackground(new Color(255, 255, 255));
         B1.setBackground(new Color(255, 255, 255));
@@ -3215,7 +3330,7 @@ public class Dashboard extends javax.swing.JFrame {
         B8.setBackground(new Color(255, 255, 255));
         B9.setBackground(new Color(255, 255, 255));
     }
-    
+
     private void selectAll(Color WHITE) {
         B0.setBackground(WHITE);
         //this.selectSubSeries(B0);
@@ -3238,7 +3353,7 @@ public class Dashboard extends javax.swing.JFrame {
         B9.setBackground(WHITE);
         //this.selectSubSeries(B9);
     }
-    
+
     public void resetVarticalInput() {
         I_0.setText("");
         I_10.setText("");
@@ -3251,7 +3366,7 @@ public class Dashboard extends javax.swing.JFrame {
         I_80.setText("");
         I_90.setText("");
     }
-    
+
     public void resetHorizontalInput() {
         B_0.setText("");
         B_1.setText("");
@@ -3264,7 +3379,7 @@ public class Dashboard extends javax.swing.JFrame {
         B_8.setText("");
         B_9.setText("");
     }
-    
+
     public static void resetClock() {
         try {
             String data = httpAPI._jsonRequest("?r=updateGameRound", "");
@@ -3274,45 +3389,54 @@ public class Dashboard extends javax.swing.JFrame {
             id.setText("D_" + myResponse.getString("id"));
             start.setText(myResponse.getString("stime"));
             end.setText(myResponse.getString("etime"));
+            String strTime = myResponse.getString("etime");
+//            DateFormat dateFormat = new SimpleDateFormat("hh:mm aa");
+//            Date d = dateFormat.parse(strTime);
+            dTime.setText(TimeFormats.timeConvert(strTime));
             interval = Integer.parseInt(myResponse.getString("time"));
-            
+            Dashboard.resultBoard("ALL");
+
         } catch (JSONException ex) {
             System.out.println(ex.getMessage());
         }
     }
-    
+
     public static void inisetClockCounter() {
         try {
             String data = httpAPI._jsonRequest("?r=updateGameRound", "");
-            // System.out.println(data);
+            System.out.println("Draw Data " + data);
             JSONObject myResponse = new JSONObject(data);
             buy.setEnabled(true);
             id.setText("D_" + myResponse.getString("id"));
             start.setText(myResponse.getString("stime"));
             end.setText(myResponse.getString("etime"));
+            String strTime = myResponse.getString("etime");
+//            DateFormat dateFormat = new SimpleDateFormat("hh:mm aa");
+//            Date d = dateFormat.parse(strTime);
+            dTime.setText(TimeFormats.timeConvert(strTime));
             Dashboard.closckDraw(myResponse.getString("time"));
         } catch (JSONException ex) {
             System.out.println(ex.getMessage());
         }
     }
-    
+
     public static void closckDraw(String secs) {
-        
+
         int delay = 1000;
         int period = 1000;
         timer = new Timer();
         interval = Integer.parseInt(secs);
         //System.out.println(secs);
         timer.scheduleAtFixedRate(new TimerTask() {
-            
+
             @Override
             public void run() {
                 drawClock.setText(formatSeconds(setInterval()));
-                
+
             }
         }, delay, period);
     }
-    
+
     private static final int setInterval() {
         if (interval == 10) {
             buy.setEnabled(false);
@@ -3322,37 +3446,37 @@ public class Dashboard extends javax.swing.JFrame {
         }
         return --interval;
     }
-    
+
     public static String formatSeconds(int timeInSeconds) {
         int hours = timeInSeconds / 3600;
         int secondsLeft = timeInSeconds - hours * 3600;
         int minutes = secondsLeft / 60;
         int seconds = secondsLeft - minutes * 60;
-        
+
         String formattedTime = "";
         if (hours < 10) {
             formattedTime += "0";
         }
         formattedTime += hours + ":";
-        
+
         if (minutes < 10) {
             formattedTime += "0";
         }
         formattedTime += minutes + ":";
-        
+
         if (seconds < 10) {
             formattedTime += "0";
         }
         formattedTime += seconds;
-        
+
         return formattedTime;
     }
-    
+
     public static void calculateTotal() {
         try {
             int qty = 0;
             String sr = "";
-            
+
             Dashboard.final_Map = new HashMap<>();
             for (Map.Entry<String, Map> entry : Dashboard.series.entrySet()) {
                 Map<String, ArrayList> test = entry.getValue();
@@ -3373,7 +3497,7 @@ public class Dashboard extends javax.swing.JFrame {
                                 } else {
                                     int userQty = Integer.parseInt(userNumber);
                                     qty = qty + userQty;
-                                    
+
                                 }
                             }
                         }
@@ -3391,11 +3515,11 @@ public class Dashboard extends javax.swing.JFrame {
             //System.out.println(Dashboard.multiSeries);
 
         } catch (Exception ex) {
-            
+
         }
-        
+
     }
-    
+
     public static void dispalyTotal() {
         try {
             int finalQty = 0;
@@ -3413,13 +3537,13 @@ public class Dashboard extends javax.swing.JFrame {
             totalqty.setText(finalQty + "");
             totalamt.setText(finalAmt + "");
         } catch (Exception edx) {
-            
+
         }
     }
-    
+
     public static void ResttotalField() {
         int i = 1;
-        
+
         while (i <= 10) {
             int tstart = 1000 * i;
             int tend = tstart * 900;
@@ -3433,19 +3557,19 @@ public class Dashboard extends javax.swing.JFrame {
             i++;
         }
     }
-    
+
     public void inputSystem(int p, JTextField jf) {
         try {
             if (multi.isSelected()) {
                 if ("".equals(subSeriesNo.getText()) && Dashboard.multiSeries.size() <= 0) {
                     JOptionPane.showMessageDialog(null, "Please select sereis first");
-                    
+
                 } else {
-                    
+
                     String index = "" + p;
                     int tQty = 0;
                     int tPoint = 0;
-                    
+
                     switch (NSystems.getText()) {
                         case "cross":
                             ArrayList<String> numb = Dashboard.cross(p);
@@ -3458,13 +3582,13 @@ public class Dashboard extends javax.swing.JFrame {
                                 index = "" + K;
                                 tQty = tQty + Integer.parseInt(jf.getText());
                                 Dashboard.setNumberMulti(index, jf.getText(), seriesLable.getText(), subSeriesNo.getText(), alls.getText());
-                                
+
                             }
-                            
+
                             break;
                         case "fixed":
                             try {
-                                
+
                                 Map<String, String> jString = new HashMap<>();
                                 JTextField temp = jField.get("E_" + p);
                                 temp.setBackground(Color.yellow);
@@ -3475,7 +3599,7 @@ public class Dashboard extends javax.swing.JFrame {
                                 String data = httpAPI._jsonRequest("?r=fpNumber", jsonEmp);
                                 System.out.println(data);
                                 JSONObject myResponse = new JSONObject(data);
-                                
+
                                 int so = 1;
                                 while (so <= myResponse.length()) {
                                     JTextField temdp = jField.get("E_" + myResponse.getString("" + so));
@@ -3488,7 +3612,7 @@ public class Dashboard extends javax.swing.JFrame {
                                 System.out.println(ex.getMessage());
                             }
                             break;
-                        
+
                         default:
                             index = "" + p;
                             JTextField temp = jField.get("E_" + p);
@@ -3505,7 +3629,7 @@ public class Dashboard extends javax.swing.JFrame {
                 String index = "" + p;
                 int tQty = 0;
                 int tPoint = 0;
-                
+
                 switch (NSystems.getText()) {
                     case "cross":
                         ArrayList<String> numb = Dashboard.cross(p);
@@ -3518,13 +3642,13 @@ public class Dashboard extends javax.swing.JFrame {
                             index = "" + K;
                             tQty = tQty + Integer.parseInt(jf.getText());
                             Dashboard.setNumber(index, jf.getText(), seriesLable.getText(), subSeriesNo.getText());
-                            
+
                         }
-                        
+
                         break;
                     case "fixed":
                         try {
-                            
+
                             Map<String, String> jString = new HashMap<>();
                             JTextField temp = jField.get("E_" + p);
                             temp.setBackground(Color.yellow);
@@ -3535,7 +3659,7 @@ public class Dashboard extends javax.swing.JFrame {
                             String data = httpAPI._jsonRequest("?r=fpNumber", jsonEmp);
                             System.out.println(data);
                             JSONObject myResponse = new JSONObject(data);
-                            
+
                             int so = 1;
                             while (so <= myResponse.length()) {
                                 JTextField temdp = jField.get("E_" + myResponse.getString("" + so));
@@ -3548,7 +3672,7 @@ public class Dashboard extends javax.swing.JFrame {
                             System.out.println(ex.getMessage());
                         }
                         break;
-                    
+
                     default:
                         index = "" + p;
                         JTextField temp = jField.get("E_" + p);
@@ -3556,14 +3680,14 @@ public class Dashboard extends javax.swing.JFrame {
                         Dashboard.setNumber(index, temp.getText(), seriesLable.getText(), subSeriesNo.getText());
                         break;
                 }
-                
+
             }
             Dashboard.calculateTotal();
         } catch (Exception ex) {
-            
+
         }
     }
-    
+
     private void getPreviousNumber(JButton B0) {
         try {
             JTextField temp;
@@ -3583,12 +3707,12 @@ public class Dashboard extends javax.swing.JFrame {
                     temp.setBackground(Color.yellow);
                 }
             }
-            
+
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
     }
-    
+
     public static void resetFinalTotal() {
         for (int i = 1000; i <= 10990; i = i + 1000) {
             int t = i + 900;
@@ -3597,11 +3721,11 @@ public class Dashboard extends javax.swing.JFrame {
             tm.setText("");
             tm = totalField.get("A" + i + "_" + t);
             tm.setText("");
-            
+
         }
-        
+
     }
-    
+
     private static boolean checkSubSeries(String btxt, String text) {
         boolean r = false;
         try {
@@ -3615,12 +3739,12 @@ public class Dashboard extends javax.swing.JFrame {
                 r = false;
             }
         } catch (Exception ex) {
-            
+
         }
         return r;
-        
+
     }
-    
+
     private static ArrayList<String> cross(int p) {
         String index = "" + p;
         ArrayList<String> num = new ArrayList<>();
@@ -3634,7 +3758,7 @@ public class Dashboard extends javax.swing.JFrame {
             int K = p + 11;
             int s = 1;
             while (K <= 99 && s <= rightbottom) {
-                
+
                 num.add("" + K);
                 K = K + 11;
                 s++;
@@ -3642,7 +3766,7 @@ public class Dashboard extends javax.swing.JFrame {
             K = p - 11;
             s = 1;
             while (K >= 0 && s <= rightbottom) {
-                
+
                 num.add("" + K);
                 K = K - 11;
                 s++;
@@ -3650,7 +3774,7 @@ public class Dashboard extends javax.swing.JFrame {
             K = p + 9;
             s = 1;
             while (K <= 99 && s <= leftbottom) {
-                
+
                 num.add("" + K);
                 K = K + 9;
                 s++;
@@ -3658,7 +3782,7 @@ public class Dashboard extends javax.swing.JFrame {
             K = p - 9;
             s = 1;
             while (K > 0 && s <= leftbottom) {
-                
+
                 num.add("" + K);
                 K = K - 9;
                 s++;
@@ -3667,11 +3791,11 @@ public class Dashboard extends javax.swing.JFrame {
             //index = "" + p;
             System.out.println(num);
         } catch (Exception ex) {
-            
+
         }
         return num;
     }
-    
+
     private void updateBalance() {
         Thread Balance = new Thread() {
             @Override
@@ -3699,20 +3823,20 @@ public class Dashboard extends javax.swing.JFrame {
         };
         Balance.start();
     }
-    
+
     private void resetAll() {
         try {
             subSeriesNo.setText("");
             alls.setText("");
             CMulti.setText("");
             NSystems.setText("");
-            
+
             multi.setSelected(false);
             cross.setSelected(false);
             odd.setSelected(false);
             even.setSelected(false);
             fixed.setSelected(false);
-            
+
             totalamt.setText("");
             totalqty.setText("");
             Dashboard.advance.setText("false");
@@ -3731,9 +3855,190 @@ public class Dashboard extends javax.swing.JFrame {
             if (Dashboard.multiSeries.size() >= 0) {
                 Dashboard.multiSeries.clear();
             }
-            
+            this.lastTransaction();
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
+        }
+    }
+
+    public static void resultBoard(String srs) {
+        try {
+            resultPane.removeAll();
+            resultPane.repaint();
+            Map<String, String> finalMap = new HashMap<>();
+            String ids[] = id.getText().split("_");
+            finalMap.put("drawid", ids[1]);
+            finalMap.put("series", srs);
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            String jsonEmp = gson.toJson(finalMap);
+            System.out.println(jsonEmp);
+            String Data = httpAPI._jsonRequest("?r=singleResult", jsonEmp);
+
+            ArrayList<Map> wPoint = singleResult.singleResultJSONPrint(Data);
+
+            int ip = 0;
+            int x = 10;
+            int y = 5;
+            int a = 79;
+            int b = 29;
+
+            String ColorArray[] = new String[]{"212,133,194", "130,180,126", "122,180,232", "91,163,106", "217,141,129", "185,177,230", "234,158,123", "164,204,90", "201,189,175", "23,188,189"};
+            // resultPane.setLayout()
+            //resultPane.setLayout(new FlowLayout());
+            for (int j = 0; j < wPoint.size(); j++) {
+                Map<String, String> dPoint = wPoint.get(j);
+                int ks = 0;
+                //System.out.println("Data \n" + dPoint);
+                String subSeries[] = null;
+                for (Map.Entry<String, String> finas : dPoint.entrySet()) {
+                    if (finas.getKey().equals("series")) {
+                        subSeries = finas.getValue().split("-");
+                    }
+                }
+                for (Map.Entry<String, String> finas : dPoint.entrySet()) {
+                    if (finas.getKey().equals("series")) {
+                        //subSeries = finas.getValue().split("-");
+                    } else {
+                        int key = Integer.parseInt(finas.getKey());
+                        int i = Integer.parseInt(subSeries[0]) + (100 * key);
+                        int fl = i + Integer.parseInt(finas.getValue());
+                        //System.out.println("" + fl);
+                        JLabel jLable = new JLabel("" + fl);
+                        jLable.setBounds(x, y, a, b);
+                        jLable.setFont(new java.awt.Font("Monospaced", 1, 30)); // NOI18N
+                        String col[] = ColorArray[ks].split(",");
+                        //System.out.println(ColorArray[ks]);
+                        jLable.setOpaque(true);
+                        jLable.setBackground(new java.awt.Color(Integer.parseInt(col[0]), Integer.parseInt(col[1]), Integer.parseInt(col[2])));
+                        jLable.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+                        jLable.setText("" + fl);
+                        jLable.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+                        resultPane.add(jLable);
+
+                        if (ip == 9) {
+                            y = 30 + y;
+                            x = 10;
+                            ip = -1;
+                        } else {
+                            x = 80 + x;
+                            //break;
+                        }
+                        ip++;
+
+                        ks++;
+
+                    }
+                }
+
+            }
+//            try {
+//                Thread.sleep(20000);
+//            } catch (InterruptedException ex) {
+//
+//            }
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+//        try {
+//            Thread t = new Thread() {
+//                @Override
+//                public void run() {
+//                    if (true) {
+//                        
+//                    }
+//                }
+//            };
+//            t.start();
+//        } catch (Exception ex) {
+//            System.out.println();
+//        }
+    }
+
+    public void setLabelColor() {
+        result.setOpaque(true);
+        result.setBackground(new java.awt.Color(141, 235, 237));
+        account.setOpaque(true);
+        account.setBackground(new java.awt.Color(141, 235, 237));
+        operator.setOpaque(true);
+        operator.setBackground(new java.awt.Color(141, 235, 237));
+        reprint.setOpaque(true);
+        reprint.setBackground(new java.awt.Color(141, 235, 237));
+        cancel.setOpaque(true);
+        cancel.setBackground(new java.awt.Color(141, 235, 237));
+        password.setOpaque(true);
+        password.setBackground(new java.awt.Color(141, 235, 237));
+        complaint.setOpaque(true);
+        complaint.setBackground(new java.awt.Color(141, 235, 237));
+        singout.setOpaque(true);
+        singout.setBackground(new java.awt.Color(141, 235, 237));
+
+    }
+
+    public void loadPrinter() {
+        try {
+            printer.setVisible(true);
+            DocFlavor flavor = DocFlavor.BYTE_ARRAY.AUTOSENSE;
+            PrintRequestAttributeSet pras = new HashPrintRequestAttributeSet();
+
+            PrintService printServices[] = PrintServiceLookup.lookupPrintServices(
+                    flavor, pras);
+            boolean flag = true;
+            int ip = 0;
+            int x = 10;
+            int y = 20;
+            int a = 100;
+            int b = 15;
+            ButtonGroup bg = new ButtonGroup();
+            for (PrintService printerService : printServices) {
+                JRadioButton jButtong = new JRadioButton(printerService.getName());
+                if (flag) {
+                    jButtong.setBounds(x, y, a, b);
+                    jButtong.setSelected(true);
+                    flag = false;
+                    printer.setText(printerService.getName());
+                } else {
+                    jButtong.setBounds(x, y, a, b);
+                }
+                jButtong.setBackground(new Color(255, 255, 255));
+                jButtong.setText(printerService.getName());
+                jButtong.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        printer.setText(jButtong.getText());
+                    }
+                });
+                if (ip == 0) {
+                    y = 15 + y;
+                    x = 10;
+                    ip = -1;
+                } else {
+                    x = 100 + x;
+                    //break;
+                }
+                ip++;
+                bg.add(jButtong);
+                printerPanel.add(jButtong);
+
+                System.out.println("Printer = " + printerService.getName());
+            }
+
+        } catch (Exception ex) {
+
+        }
+    }
+
+    public void lastTransaction() {
+        try {
+            Map<String, String> finalMap = new HashMap<>();
+            finalMap.put("userid", userid.getText());
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            String finalData = gson.toJson(finalMap);
+            String data = httpAPI._jsonRequest("?r=lastTransaction", finalData);
+            JSONObject myResponse = new JSONObject(data);
+            last.setText(myResponse.getString("last"));
+            lastamt.setText("Rs. " + myResponse.getString("lastamt"));
+        } catch (Exception ex) {
+
         }
     }
 }

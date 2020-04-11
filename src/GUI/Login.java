@@ -130,7 +130,6 @@ public class Login extends javax.swing.JFrame {
 
         msg.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
         msg.setForeground(new java.awt.Color(217, 168, 108));
-        msg.setText("jLabel7");
         jPanel1.add(msg, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 40, -1, -1));
 
         jLabel8.setForeground(new java.awt.Color(254, 254, 254));

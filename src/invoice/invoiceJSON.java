@@ -10,6 +10,7 @@ package invoice;
  * @author asksoft
  */
 // Java program to read JSON from a file 
+import GUI.Dashboard;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -74,7 +75,7 @@ public class invoiceJSON {
                 printPage += "Invoice " + printMap.get("game") + "\n";
                 //printPage += invoiceJSON.getBarocde();
                 System.out.println(printPage);
-                PrintInvoice.Sample("PDF", printPage, printMap.get("game"));
+                PrintInvoice.Sample(Dashboard.printer.getText(), printPage, printMap.get("game"));
 //            printerService.printString("PDF", printPage);
 //            byte[] cutP = new byte[]{0x1d, 'V', 1};
 //            printerService.printBytes("PDF", cutP);

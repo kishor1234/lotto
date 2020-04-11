@@ -16,6 +16,7 @@ public class Main {
             PrinterService printerService = new PrinterService();
 
             System.out.println(printerService.getPrinters());
+            System.exit(0);
 
             for (int i = 1; i <= 10; i++) {
                 //print some stuff
