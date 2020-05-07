@@ -42,6 +42,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import org.json.JSONException;
 import org.json.JSONObject;
+import table.tickets;
 
 /**
  *
@@ -194,7 +195,6 @@ public class Dashboard extends javax.swing.JFrame {
         singout = new javax.swing.JLabel();
         password = new javax.swing.JLabel();
         seriesLable = new javax.swing.JLabel();
-        result = new javax.swing.JLabel();
         complaint = new javax.swing.JLabel();
         B0 = new javax.swing.JButton();
         jCheckBox1 = new javax.swing.JCheckBox();
@@ -397,6 +397,7 @@ public class Dashboard extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
         printerPanel = new javax.swing.JPanel();
         printer = new javax.swing.JLabel();
+        rBox = new javax.swing.JComboBox();
         jPanel13 = new javax.swing.JPanel();
         claimReader = new javax.swing.JTextField();
         b1 = new javax.swing.JButton();
@@ -405,6 +406,7 @@ public class Dashboard extends javax.swing.JFrame {
         bSeries = new javax.swing.JButton();
         jLabel9 = new javax.swing.JLabel();
         resultPane = new javax.swing.JPanel();
+        result = new javax.swing.JLabel();
         imagePanel = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         jPanel7 = new javax.swing.JPanel();
@@ -420,6 +422,7 @@ public class Dashboard extends javax.swing.JFrame {
         jLabel24.setText("jLabel24");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setUndecorated(true);
 
         jPanel1.setBackground(new java.awt.Color(18, 61, 235));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -474,14 +477,6 @@ public class Dashboard extends javax.swing.JFrame {
             }
         });
         jPanel2.add(seriesLable, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 70, 168, 26));
-
-        result.setBackground(new java.awt.Color(141, 235, 237));
-        result.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
-        result.setForeground(new java.awt.Color(1, 1, 1));
-        result.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        result.setText("Result");
-        result.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        jPanel2.add(result, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 10, 120, 26));
 
         complaint.setBackground(new java.awt.Color(141, 235, 237));
         complaint.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
@@ -1407,6 +1402,11 @@ public class Dashboard extends javax.swing.JFrame {
                 buyActionPerformed(evt);
             }
         });
+        buy.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                buyKeyPressed(evt);
+            }
+        });
         jPanel2.add(buy, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 460, 240, 30));
 
         jLabel7.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
@@ -1564,6 +1564,11 @@ public class Dashboard extends javax.swing.JFrame {
         reprint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         reprint.setText("Reprint");
         reprint.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        reprint.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                reprintMouseClicked(evt);
+            }
+        });
         jPanel2.add(reprint, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 10, 100, 26));
 
         cancel.setBackground(new java.awt.Color(141, 235, 237));
@@ -1572,6 +1577,11 @@ public class Dashboard extends javax.swing.JFrame {
         cancel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         cancel.setText("Cancel");
         cancel.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        cancel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                cancelMouseClicked(evt);
+            }
+        });
         jPanel2.add(cancel, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 10, 100, 26));
 
         jPanel4.setBackground(new java.awt.Color(250, 244, 154));
@@ -1652,6 +1662,21 @@ public class Dashboard extends javax.swing.JFrame {
 
         jPanel2.add(printerPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 138, 95));
 
+        rBox.setBackground(new java.awt.Color(141, 235, 237));
+        rBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Result", "Today Result", "Past Result" }));
+        rBox.setAutoscrolls(true);
+        rBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        rBox.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        rBox.setDebugGraphicsOptions(javax.swing.DebugGraphics.NONE_OPTION);
+        rBox.setEditor(null);
+        rBox.setFocusCycleRoot(true);
+        rBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rBoxActionPerformed(evt);
+            }
+        });
+        jPanel2.add(rBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 10, 120, -1));
+
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 100, 1170, 500));
 
         jPanel13.setBackground(new java.awt.Color(255, 255, 255));
@@ -1659,6 +1684,9 @@ public class Dashboard extends javax.swing.JFrame {
         jPanel13.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         claimReader.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                claimReaderKeyPressed(evt);
+            }
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 claimReaderKeyReleased(evt);
             }
@@ -1721,15 +1749,26 @@ public class Dashboard extends javax.swing.JFrame {
         resultPane.setBackground(new java.awt.Color(254, 254, 254));
         resultPane.setAutoscrolls(true);
 
+        result.setBackground(new java.awt.Color(141, 235, 237));
+        result.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
+        result.setForeground(new java.awt.Color(1, 1, 1));
+        result.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        result.setText("Result");
+        result.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+
         javax.swing.GroupLayout resultPaneLayout = new javax.swing.GroupLayout(resultPane);
         resultPane.setLayout(resultPaneLayout);
         resultPaneLayout.setHorizontalGroup(
             resultPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 830, Short.MAX_VALUE)
+            .addGroup(resultPaneLayout.createSequentialGroup()
+                .addComponent(result, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 710, Short.MAX_VALUE))
         );
         resultPaneLayout.setVerticalGroup(
             resultPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, resultPaneLayout.createSequentialGroup()
+                .addGap(0, 74, Short.MAX_VALUE)
+                .addComponent(result, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         jPanel1.add(resultPane, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 0, 830, 100));
@@ -1744,17 +1783,13 @@ public class Dashboard extends javax.swing.JFrame {
         imagePanel.setLayout(imagePanelLayout);
         imagePanelLayout.setHorizontalGroup(
             imagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, imagePanelLayout.createSequentialGroup()
-                .addContainerGap(24, Short.MAX_VALUE)
-                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(24, 24, 24))
+            .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
         );
         imagePanelLayout.setVerticalGroup(
             imagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, imagePanelLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel3)
-                .addContainerGap())
+            .addGroup(imagePanelLayout.createSequentialGroup()
+                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         jPanel1.add(imagePanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 150, 100));
@@ -2215,7 +2250,7 @@ public class Dashboard extends javax.swing.JFrame {
                                     finalMap.put("data", Dashboard.series);
                                     Gson gson = new GsonBuilder().setPrettyPrinting().create();
                                     String jsonEmp = gson.toJson(finalMap);
-                                    System.out.println(jsonEmp);
+                                    //System.out.println(jsonEmp);
 
                                     String Data = httpAPI._jsonRequest("?r=invoice", jsonEmp);
                                     //System.out.println("Data \n" + Data);
@@ -2238,9 +2273,9 @@ public class Dashboard extends javax.swing.JFrame {
                                 finalMap.put("data", Dashboard.series);
                                 Gson gson = new GsonBuilder().setPrettyPrinting().create();
                                 String jsonEmp = gson.toJson(finalMap);
-                                System.out.println(jsonEmp);
+                                //System.out.println(jsonEmp);
                                 String Data = httpAPI._jsonRequest("?r=invoice", jsonEmp);
-                                System.out.println("Data \n" + Data);
+                                //System.out.println("Data \n" + Data);
                                 invoiceJSON.invoiceJSONPrint(Data);
                                 msg = invoiceJSON.invoiceJSONPrint(Data);
                                 lastTransaction();
@@ -2411,9 +2446,9 @@ public class Dashboard extends javax.swing.JFrame {
                         finalMap.put("userid", userid.getText());
                         Gson gson = new GsonBuilder().setPrettyPrinting().create();
                         String jsonEmp = gson.toJson(finalMap);
-                        System.out.println(jsonEmp);
+                        //System.out.println(jsonEmp);
                         String data = httpAPI._jsonRequest("?r=checkWinner", jsonEmp);
-                        System.out.println(data);
+                        //System.out.println(data);
                         String msg = claimJSON.claimJSONPrint(data);
                         JOptionPane.showMessageDialog(null, msg);
                         claimReader.setText("");
@@ -2438,20 +2473,72 @@ public class Dashboard extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        try{
-            if(multi.isSelected())
-            {
+        try {
+            if (multi.isSelected()) {
                 //call default
-                 resultBoard("ALL");
-            }else{
+                resultBoard("ALL");
+            } else {
                 /// single display
                 resultBoard(seriesLable.getText());
             }
-        }catch(Exception ed)
-        {
-            
+        } catch (Exception ed) {
+
         }
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void rBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rBoxActionPerformed
+        // TODO add your handling code here:
+        ResultWed rw = new ResultWed();
+        switch (rBox.getSelectedItem().toString()) {
+            case "Today Result":
+                Thread resutlToday = new Thread() {
+                    @Override
+                    public void run() {
+                        rw.showResult();
+                    }
+                };
+                resutlToday.start();
+
+                break;
+            case "Past Result":
+//                new Result().setVisible(true);
+                Thread resultP = new Thread() {
+                    @Override
+                    public void run() {
+                        rw.showResult();
+                    }
+                };
+                resultP.start();
+                break;
+            default:
+                break;
+        }
+        rBox.setSelectedIndex(0);
+    }//GEN-LAST:event_rBoxActionPerformed
+
+    private void reprintMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_reprintMouseClicked
+        // TODO add your handling code here:
+        new tickets("Print").setVisible(true);
+    }//GEN-LAST:event_reprintMouseClicked
+
+    private void cancelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cancelMouseClicked
+        // TODO add your handling code here:
+        new tickets("Cancel").setVisible(true);
+    }//GEN-LAST:event_cancelMouseClicked
+
+    private void buyKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_buyKeyPressed
+        // TODO add your handling code here:
+//        if (evt.getKeyCode() == KeyEvent.VK_F6) {
+//            System.out.println("Hello");
+//            JOptionPane.showMessageDialog(this, "You've Submitted the name ");
+//        }
+//
+//        
+    }//GEN-LAST:event_buyKeyPressed
+
+    private void claimReaderKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_claimReaderKeyPressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_claimReaderKeyPressed
 
     /**
      * @param args the command line arguments
@@ -2708,6 +2795,7 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JLabel password;
     public static javax.swing.JLabel printer;
     private javax.swing.JPanel printerPanel;
+    private javax.swing.JComboBox rBox;
     private javax.swing.JLabel reprint;
     private javax.swing.JLabel result;
     public static javax.swing.JPanel resultPane;
@@ -2718,7 +2806,7 @@ public class Dashboard extends javax.swing.JFrame {
     public static javax.swing.JTextField totalamt;
     public static javax.swing.JTextField totalqty;
     private javax.swing.JLabel uid;
-    private javax.swing.JLabel userid;
+    public static javax.swing.JLabel userid;
     // End of variables declaration//GEN-END:variables
 
     public static void selectDefaultSeries(int i) {
@@ -2997,13 +3085,13 @@ public class Dashboard extends javax.swing.JFrame {
 
     public static void setSubSeries(String subSeries, String Main) {//Mian=1000-1900
         try {
-            System.out.println(Main);
-            Map<String, Map> mainSeries = Dashboard.series.get(Main);//get Main         
+            Map<String, Map> mainSeries = Dashboard.series.get(Main);//get Main   
             Map<String, ArrayList> tempSubSeries = new HashMap<>();
             ArrayList<Map> aMap = new ArrayList<>();
             String s[] = subSeries.split("-");
             tempSubSeries.put(s[0], aMap);
             mainSeries.put(s[0], tempSubSeries);
+            //System.out.println(mainSeries);
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
@@ -3054,6 +3142,7 @@ public class Dashboard extends javax.swing.JFrame {
 
     public static final void setNumberMulti(String index, String value, String Main, String Sub, String state) {
         try {
+
             for (String series : Dashboard.multiSeries) {
                 if (state.equals("true")) {
                     String ss[] = series.split("-");
@@ -3086,32 +3175,31 @@ public class Dashboard extends javax.swing.JFrame {
 
                     }
                 } else {
-                    for (String seriess : Dashboard.multiSeries) {
-                        String ss[] = Sub.split("-");
-                        String ser[] = series.split("-");
-                        Map<String, Map> mainSeries = Dashboard.series.get(seriess);//Main
-                        int sp = Integer.parseInt(ss[0]) + Integer.parseInt(ser[0]) - 1000;
-                        if (mainSeries.get("" + sp) == null) {
-                            Dashboard.setSubSeries("" + sp, series);
-                        }
-                        Map<String, ArrayList> tempSubSeries = mainSeries.get("" + sp);//Sub
-                        ArrayList<Map> aMap = tempSubSeries.get("" + sp);//Array
-                        boolean flag = false;
-                        for (int i = 0; i < aMap.size(); ++i) {
-                            Map<String, String> numberTemp = aMap.get(i);
-                            for (Map.Entry<String, String> finas : numberTemp.entrySet()) {
-                                if (finas.getKey().equals(index)) {
-                                    numberTemp.replace(finas.getKey(), value);
-                                    flag = true;
-                                }
+//                    
+                    String ss[] = Sub.split("-");
+                    String ser[] = series.split("-");
+                    Map<String, Map> mainSeries = Dashboard.series.get(series);//Main
+                    int sp = Integer.parseInt(ss[0]) + Integer.parseInt(ser[0]) - 1000;
+                    if (mainSeries.get("" + sp) == null) {
+                        Dashboard.setSubSeries("" + sp, series);
+                    }
+                    Map<String, ArrayList> tempSubSeries = mainSeries.get("" + sp);//Sub
+                    ArrayList<Map> aMap = tempSubSeries.get("" + sp);//Array
+                    boolean flag = false;
+                    for (int i = 0; i < aMap.size(); ++i) {
+                        Map<String, String> numberTemp = aMap.get(i);
+                        for (Map.Entry<String, String> finas : numberTemp.entrySet()) {
+                            if (finas.getKey().equals(index)) {
+                                numberTemp.replace(finas.getKey(), value);
+                                flag = true;
                             }
+                        }
 
-                        }
-                        if (!flag) {
-                            Map<String, String> number = new HashMap<>();
-                            number.put(index, value);
-                            aMap.add(number);
-                        }
+                    }
+                    if (!flag) {
+                        Map<String, String> number = new HashMap<>();
+                        number.put(index, value);
+                        aMap.add(number);
                     }
                 }
             }
@@ -3156,9 +3244,10 @@ public class Dashboard extends javax.swing.JFrame {
 //                            System.out.println(ex.getMessage());
 //                        }
 //                    }
-                    // System.out.println(Dashboard.series);
+
                     //Gson gson = new GsonBuilder().setPrettyPrinting().create();
                     while (true) {
+                        //System.out.println(Dashboard.series);
                         //  String jsonEmp = gson.toJson(Dashboard.multiSeries);
                         // System.out.println(jsonEmp);
                         //System.out.println(advanceDrawArray);
@@ -3573,9 +3662,11 @@ public class Dashboard extends javax.swing.JFrame {
                     switch (NSystems.getText()) {
                         case "cross":
                             ArrayList<String> numb = Dashboard.cross(p);
+
                             String K;
                             for (int i = 0; i < numb.size(); i++) {
                                 K = numb.get(i);
+                               // System.out.println("Cross K " + K);
                                 JTextField temp = jField.get("E_" + K);
                                 temp.setText(jf.getText());
                                 temp.setBackground(Color.yellow);
@@ -3597,7 +3688,7 @@ public class Dashboard extends javax.swing.JFrame {
                                 String jsonEmp = gson.toJson(jString);
                                 //System.out.println(jsonEmp);
                                 String data = httpAPI._jsonRequest("?r=fpNumber", jsonEmp);
-                                System.out.println(data);
+                               // System.out.println(data);
                                 JSONObject myResponse = new JSONObject(data);
 
                                 int so = 1;
@@ -3657,7 +3748,7 @@ public class Dashboard extends javax.swing.JFrame {
                             String jsonEmp = gson.toJson(jString);
                             //System.out.println(jsonEmp);
                             String data = httpAPI._jsonRequest("?r=fpNumber", jsonEmp);
-                            System.out.println(data);
+                            //System.out.println(data);
                             JSONObject myResponse = new JSONObject(data);
 
                             int so = 1;
@@ -3789,7 +3880,7 @@ public class Dashboard extends javax.swing.JFrame {
             }
             //int rightbottom = last - p; //right difference
             //index = "" + p;
-            System.out.println(num);
+            //System.out.println(num);
         } catch (Exception ex) {
 
         }
@@ -3871,7 +3962,7 @@ public class Dashboard extends javax.swing.JFrame {
             finalMap.put("series", srs);
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             String jsonEmp = gson.toJson(finalMap);
-            System.out.println(jsonEmp);
+            //System.out.println(jsonEmp);
             String Data = httpAPI._jsonRequest("?r=singleResult", jsonEmp);
 
             ArrayList<Map> wPoint = singleResult.singleResultJSONPrint(Data);
@@ -4019,7 +4110,7 @@ public class Dashboard extends javax.swing.JFrame {
                 bg.add(jButtong);
                 printerPanel.add(jButtong);
 
-                System.out.println("Printer = " + printerService.getName());
+                //System.out.println("Printer = " + printerService.getName());
             }
 
         } catch (Exception ex) {

@@ -5,12 +5,23 @@
  */
 package GUI;
 
+import static GUI.Dashboard.printer;
 import api.SystemMacAddress;
 import api.httpAPI;
 import com.google.gson.JsonObject;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.print.DocFlavor;
+import javax.print.PrintService;
+import javax.print.PrintServiceLookup;
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.PrintRequestAttributeSet;
+import javax.swing.ButtonGroup;
+import javax.swing.JRadioButton;
 import org.json.JSONException;
 import org.json.JSONObject;
 
