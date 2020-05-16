@@ -25,7 +25,7 @@ import javax.swing.JCheckBox;
  * @author asksoft
  */
 public class series extends javax.swing.JFrame {
-    
+
     private JButton button;
     private JCheckBox jCheckBox;
 
@@ -80,14 +80,16 @@ public class series extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        setVisible(false);
-        if(Dashboard.series.size()<=0)
-        {
-            Dashboard.setMainSeries("1000-1900");
-        }
-         if(Dashboard.multiSeries.size()<=0)
-        {
-            Dashboard.multiSeries.add("1000-1900");
+        try {
+            setVisible(false);
+            if (Dashboard.series.size() <= 0) {
+                Dashboard.setMainSeries("1000-1900");
+            }
+            if (Dashboard.multiSeries.size() <= 0) {
+                Dashboard.multiSeries.add("1000-1900");
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -132,7 +134,7 @@ public class series extends javax.swing.JFrame {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             seriesData series = gson.fromJson(fileData, seriesData.class);
             if (Dashboard.multi.isSelected()) {
-                Dashboard.multiSeries = new ArrayList<>();
+                //Dashboard.multiSeries = new ArrayList<>();
                 ArrayList<Map> test = series.getProperties();
                 Iterator<Map> itr = test.iterator();
                 jPanel1.setLayout(new FlowLayout());
@@ -140,8 +142,7 @@ public class series extends javax.swing.JFrame {
                     Map<String, String> temp = itr.next();
                     System.out.println(temp.get("series"));
                     jCheckBox = new JCheckBox(temp.get("series"));
-                    if(Dashboard.series.get(temp.get("series"))!=null)
-                    {
+                    if (Dashboard.series.get(temp.get("series")) != null) {
                         jCheckBox.setSelected(true);
                     }
                     jCheckBox.addItemListener(new ItemListener() {
@@ -159,10 +160,10 @@ public class series extends javax.swing.JFrame {
                                 Dashboard.removeMainSeries(temp.get("series"));
                             }
                         }
-                        
+
                     });
                     jPanel1.add(jCheckBox);
-                    
+
                 }
 //          
             } else {
@@ -184,18 +185,18 @@ public class series extends javax.swing.JFrame {
                             Dashboard.selectDefaultSeries(sr);
                             this.hideForm();
                         }
-                        
+
                         private void hideForm() {
                             setVisible(false);
                         }
-                        
+
                     });
                     //button.setBounds(i, 30, 100, 30);
                     jPanel1.add(button);
-                    
+
                 }
             }
-            
+
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }

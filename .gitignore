@@ -1,2 +1,4 @@
 build
 *.class
+/src/Bill_system/nbproject/private/
+/dist/
