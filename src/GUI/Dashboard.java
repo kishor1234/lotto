@@ -74,8 +74,9 @@ public class Dashboard extends javax.swing.JFrame {
     static Timer timer;
     public static Map<String, Integer> final_Map;
     public static Map<String, JTextField> totalField = new HashMap<>();
+    public String placeholder = "";
 
-    public Dashboard(String data) {
+    public Dashboard(String data, String printers) {
         try {
             initComponents();
             advanceDrawArray = new ArrayList<>();
@@ -87,11 +88,12 @@ public class Dashboard extends javax.swing.JFrame {
             start.setVisible(false);
             end.setVisible(false);
             //id.setVisible(false);
+            printer.setText(printers);
             this.mapButton();
             this.mapJTextField();
             Dashboard.runNSOutput();
             this.setLocationRelativeTo(null);
-            this.setMessageBar();
+            messageRefreshThread();
             mapVarticalTextField();
             mapHorizontalTextField();
             JSONObject myResponse = new JSONObject(data);
@@ -107,6 +109,8 @@ public class Dashboard extends javax.swing.JFrame {
 //            }
             for (int i = 0; i < 100; i++) {
                 JTextField jf = jField.get("E_" + i);
+                //jf.setBorder(javax.swing.BorderFactory.createTitledBorder(null, (i < 10 ? "0" : "") + i, javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 1, 7))); // NOI18N
+
                 int p = i;
 
                 jf.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -114,7 +118,41 @@ public class Dashboard extends javax.swing.JFrame {
                     @Override
                     public void keyReleased(java.awt.event.KeyEvent evt) {
                         //Logger.getLogger(Dashboard.class.getName()).log(Level.SEVERE, null, ex);
-                        inputSystem(p, jf);
+                        switch (evt.getKeyCode()) {
+                            case 40://down
+                                int down = p + 10;
+                                if (down < 100) {
+                                    JTextField dwnjf = jField.get("E_" + down);
+                                    dwnjf.requestFocus();
+                                }
+                                break;
+                            case 38://up
+                                int up = p - 10;
+                                if (up > 0) {
+                                    JTextField dwnjf = jField.get("E_" + up);
+                                    dwnjf.requestFocus();
+                                }
+                                break;
+                            case 37://left
+                                int left = p - 1;
+                                if (left > 0 && left < 100) {
+                                    JTextField dwnjf = jField.get("E_" + left);
+                                    dwnjf.requestFocus();
+                                }
+                                break;
+                            case 39://right
+                                int right = p + 1;
+                                if (right > 0 && right < 100) {
+                                    JTextField dwnjf = jField.get("E_" + right);
+                                    dwnjf.requestFocus();
+                                }
+                                break;
+                            default:
+                                inputSystem(p, jf);
+                                break;
+                        }
+
+                        jf.setText(placeholder);
 
                     }
                 });
@@ -128,6 +166,7 @@ public class Dashboard extends javax.swing.JFrame {
                         try {
                             if (!"".equals(jf.getText())) {
                                 //int temp = Integer.parseInt(jf.getText());
+                                placeholder = jf.getText();
                                 jf.setText("");
                             }
                         } catch (Exception ed) {
@@ -143,6 +182,7 @@ public class Dashboard extends javax.swing.JFrame {
                     public void focusGained(java.awt.event.FocusEvent evt) {
                         try {
                             //System.out.println(" Old : " + focusData);
+                            placeholder = jf.getText();
                             jf.setText("");
                         } catch (Exception ex) {
                             System.out.println(ex.getMessage());
@@ -171,7 +211,7 @@ public class Dashboard extends javax.swing.JFrame {
             updateBalance();
             resultBoard("ALL");
             setLabelColor();
-            loadPrinter();
+            //loadPrinter();
             lastTransaction();
         } catch (JSONException ex) {
             Logger.getLogger(Dashboard.class.getName()).log(Level.SEVERE, null, ex);
@@ -397,7 +437,8 @@ public class Dashboard extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
         printerPanel = new javax.swing.JPanel();
         printer = new javax.swing.JLabel();
-        rBox = new javax.swing.JComboBox();
+        messagePanel = new javax.swing.JPanel();
+        result = new javax.swing.JLabel();
         jPanel13 = new javax.swing.JPanel();
         claimReader = new javax.swing.JTextField();
         b1 = new javax.swing.JButton();
@@ -406,7 +447,6 @@ public class Dashboard extends javax.swing.JFrame {
         bSeries = new javax.swing.JButton();
         jLabel9 = new javax.swing.JLabel();
         resultPane = new javax.swing.JPanel();
-        result = new javax.swing.JLabel();
         imagePanel = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         jPanel7 = new javax.swing.JPanel();
@@ -422,12 +462,14 @@ public class Dashboard extends javax.swing.JFrame {
         jLabel24.setText("jLabel24");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setUndecorated(true);
+        getContentPane().setLayout(new java.awt.CardLayout());
 
         jPanel1.setBackground(new java.awt.Color(18, 61, 235));
+        jPanel1.setAutoscrolls(true);
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel2.setAutoscrolls(true);
         jPanel2.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 jPanel2KeyReleased(evt);
@@ -437,35 +479,35 @@ public class Dashboard extends javax.swing.JFrame {
 
         uid.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
         uid.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        uid.setText("D6 9523");
+        uid.setText("Kishor 20200431");
         uid.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        jPanel2.add(uid, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 40, 168, 28));
+        jPanel2.add(uid, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 37, 130, 29));
 
         singout.setBackground(new java.awt.Color(141, 235, 237));
         singout.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
         singout.setForeground(new java.awt.Color(1, 1, 1));
         singout.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         singout.setText("Sign Off ");
-        singout.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        singout.setBorder(null);
         singout.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 singoutMouseClicked(evt);
             }
         });
-        jPanel2.add(singout, new org.netbeans.lib.awtextra.AbsoluteConstraints(1060, 10, 100, 26));
+        jPanel2.add(singout, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 10, 80, 26));
 
         password.setBackground(new java.awt.Color(141, 235, 237));
         password.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
         password.setForeground(new java.awt.Color(1, 1, 1));
         password.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         password.setText("Password");
-        password.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        password.setBorder(null);
         password.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 passwordMouseClicked(evt);
             }
         });
-        jPanel2.add(password, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 10, 100, 26));
+        jPanel2.add(password, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 10, 90, 26));
 
         seriesLable.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
         seriesLable.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -476,15 +518,15 @@ public class Dashboard extends javax.swing.JFrame {
                 seriesLableMouseClicked(evt);
             }
         });
-        jPanel2.add(seriesLable, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 70, 168, 26));
+        jPanel2.add(seriesLable, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 68, 130, 28));
 
         complaint.setBackground(new java.awt.Color(141, 235, 237));
         complaint.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
         complaint.setForeground(new java.awt.Color(1, 1, 1));
         complaint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         complaint.setText("Complaint");
-        complaint.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        jPanel2.add(complaint, new org.netbeans.lib.awtextra.AbsoluteConstraints(960, 10, 100, 26));
+        complaint.setBorder(null);
+        jPanel2.add(complaint, new org.netbeans.lib.awtextra.AbsoluteConstraints(850, 10, 90, 26));
 
         B0.setBackground(new java.awt.Color(255, 255, 255));
         B0.setText("1000-2000");
@@ -494,53 +536,53 @@ public class Dashboard extends javax.swing.JFrame {
                 B0ActionPerformed(evt);
             }
         });
-        jPanel2.add(B0, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 130, 120, 30));
+        jPanel2.add(B0, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 130, 80, 30));
 
         jCheckBox1.setBackground(new java.awt.Color(212, 133, 194));
         jCheckBox1.setSelected(true);
         jCheckBox1.setText("2 * 01=0180");
-        jPanel2.add(jCheckBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 130, 129, 30));
+        jPanel2.add(jCheckBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 130, 108, 30));
 
         E_0.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
         E_0.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_0.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_0, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 130, 60, 30));
+        jPanel2.add(E_0, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 130, 60, 30));
 
         E_1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_1.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_1, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 130, 60, 30));
+        jPanel2.add(E_1, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 130, 60, 30));
 
         E_2.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_2.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_2, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 130, 60, 30));
+        jPanel2.add(E_2, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 130, 60, 30));
 
         E_3.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_3.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_3, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 130, 60, 30));
+        jPanel2.add(E_3, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 130, 60, 30));
 
         E_4.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_4.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_4, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 130, 60, 30));
+        jPanel2.add(E_4, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 130, 60, 30));
 
         E_5.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_5.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_5, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 130, 60, 30));
+        jPanel2.add(E_5, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 130, 60, 30));
 
         E_6.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_6.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_6, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 130, 60, 30));
+        jPanel2.add(E_6, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 130, 60, 30));
 
         E_7.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_7.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_7, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 130, 60, 30));
+        jPanel2.add(E_7, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 130, 60, 30));
 
         E_8.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_8.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_8, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 130, 60, 30));
+        jPanel2.add(E_8, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 130, 60, 30));
 
         E_9.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_9.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_9, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 130, 60, 30));
+        jPanel2.add(E_9, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 130, 60, 30));
 
         I_0.setBackground(new java.awt.Color(113, 232, 244));
         I_0.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -550,7 +592,7 @@ public class Dashboard extends javax.swing.JFrame {
                 I_0KeyReleased(evt);
             }
         });
-        jPanel2.add(I_0, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 130, 60, 30));
+        jPanel2.add(I_0, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 130, 60, 30));
 
         B1.setBackground(new java.awt.Color(255, 255, 255));
         B1.setText("1000-2000");
@@ -560,51 +602,51 @@ public class Dashboard extends javax.swing.JFrame {
                 B1ActionPerformed(evt);
             }
         });
-        jPanel2.add(B1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 160, 120, 30));
+        jPanel2.add(B1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 160, 80, 30));
 
         jCheckBox2.setBackground(new java.awt.Color(130, 180, 126));
         jCheckBox2.setText("2 * 01=0180");
-        jPanel2.add(jCheckBox2, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 160, 129, 30));
+        jPanel2.add(jCheckBox2, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 160, 108, 30));
 
         E_10.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_10.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_10, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 160, 60, 30));
+        jPanel2.add(E_10, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 160, 60, 30));
 
         E_11.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_11.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_11, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 160, 60, 30));
+        jPanel2.add(E_11, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 160, 60, 30));
 
         E_12.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_12.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_12, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 160, 60, 30));
+        jPanel2.add(E_12, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 160, 60, 30));
 
         E_13.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_13.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_13, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 160, 60, 30));
+        jPanel2.add(E_13, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 160, 60, 30));
 
         E_14.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_14.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_14, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 160, 60, 30));
+        jPanel2.add(E_14, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 160, 60, 30));
 
         E_15.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_15.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_15, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 160, 60, 30));
+        jPanel2.add(E_15, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 160, 60, 30));
 
         E_16.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_16.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_16, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 160, 60, 30));
+        jPanel2.add(E_16, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 160, 60, 30));
 
         E_17.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_17.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_17, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 160, 60, 30));
+        jPanel2.add(E_17, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 160, 60, 30));
 
         E_18.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_18.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_18, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 160, 60, 30));
+        jPanel2.add(E_18, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 160, 60, 30));
 
         E_19.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_19.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_19, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 160, 60, 30));
+        jPanel2.add(E_19, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 160, 60, 30));
 
         I_10.setBackground(new java.awt.Color(113, 232, 244));
         I_10.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -614,15 +656,15 @@ public class Dashboard extends javax.swing.JFrame {
                 I_10KeyReleased(evt);
             }
         });
-        jPanel2.add(I_10, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 160, 60, 30));
+        jPanel2.add(I_10, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 160, 60, 30));
 
         E_26.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_26.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_26, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 190, 60, 30));
+        jPanel2.add(E_26, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 190, 60, 30));
 
         E_20.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_20.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_20, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 190, 60, 30));
+        jPanel2.add(E_20, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 190, 60, 30));
 
         B2.setBackground(new java.awt.Color(255, 255, 255));
         B2.setText("1000-2000");
@@ -632,39 +674,39 @@ public class Dashboard extends javax.swing.JFrame {
                 B2ActionPerformed(evt);
             }
         });
-        jPanel2.add(B2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 190, 120, 30));
+        jPanel2.add(B2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 190, 80, 30));
 
         E_27.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_27.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_27, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 190, 60, 30));
+        jPanel2.add(E_27, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 190, 60, 30));
 
         E_22.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_22.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_22, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 190, 60, 30));
+        jPanel2.add(E_22, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 190, 60, 30));
 
         E_28.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_28.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_28, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 190, 60, 30));
+        jPanel2.add(E_28, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 190, 60, 30));
 
         E_21.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_21.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_21, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 190, 60, 30));
+        jPanel2.add(E_21, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 190, 60, 30));
 
         E_29.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_29.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_29, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 190, 60, 30));
+        jPanel2.add(E_29, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 190, 60, 30));
 
         jCheckBox3.setBackground(new java.awt.Color(122, 180, 232));
         jCheckBox3.setText("2 * 02=0360");
-        jPanel2.add(jCheckBox3, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 190, 129, 30));
+        jPanel2.add(jCheckBox3, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 190, 108, 30));
 
         E_23.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_23.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_23, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 190, 60, 30));
+        jPanel2.add(E_23, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 190, 60, 30));
 
         E_25.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_25.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_25, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 190, 60, 30));
+        jPanel2.add(E_25, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 190, 60, 30));
 
         I_20.setBackground(new java.awt.Color(113, 232, 244));
         I_20.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -674,15 +716,15 @@ public class Dashboard extends javax.swing.JFrame {
                 I_20KeyReleased(evt);
             }
         });
-        jPanel2.add(I_20, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 190, 60, 30));
+        jPanel2.add(I_20, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 190, 60, 30));
 
         E_24.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_24.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_24, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 190, 60, 30));
+        jPanel2.add(E_24, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 190, 60, 30));
 
         jCheckBox4.setBackground(new java.awt.Color(91, 163, 106));
         jCheckBox4.setText("2 * 03=0540");
-        jPanel2.add(jCheckBox4, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 220, 129, 30));
+        jPanel2.add(jCheckBox4, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 220, 108, 30));
 
         B3.setBackground(new java.awt.Color(255, 255, 255));
         B3.setText("1000-2000");
@@ -692,27 +734,27 @@ public class Dashboard extends javax.swing.JFrame {
                 B3ActionPerformed(evt);
             }
         });
-        jPanel2.add(B3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 220, 120, 30));
+        jPanel2.add(B3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 220, 80, 30));
 
         E_32.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_32.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_32, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 220, 60, 30));
+        jPanel2.add(E_32, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 220, 60, 30));
 
         E_33.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_33.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_33, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 220, 60, 30));
+        jPanel2.add(E_33, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 220, 60, 30));
 
         E_30.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_30.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_30, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 220, 60, 30));
+        jPanel2.add(E_30, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 220, 60, 30));
 
         E_36.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_36.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_36, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 220, 60, 30));
+        jPanel2.add(E_36, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 220, 60, 30));
 
         E_37.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_37.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_37, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 220, 60, 30));
+        jPanel2.add(E_37, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 220, 60, 30));
 
         I_30.setBackground(new java.awt.Color(113, 232, 244));
         I_30.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -722,27 +764,27 @@ public class Dashboard extends javax.swing.JFrame {
                 I_30KeyReleased(evt);
             }
         });
-        jPanel2.add(I_30, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 220, 60, 30));
+        jPanel2.add(I_30, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 220, 60, 30));
 
         E_39.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_39.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_39, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 220, 60, 30));
+        jPanel2.add(E_39, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 220, 60, 30));
 
         E_34.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_34.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_34, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 220, 60, 30));
+        jPanel2.add(E_34, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 220, 60, 30));
 
         E_38.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_38.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_38, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 220, 60, 30));
+        jPanel2.add(E_38, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 220, 60, 30));
 
         E_35.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_35.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_35, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 220, 60, 30));
+        jPanel2.add(E_35, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 220, 60, 30));
 
         E_31.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_31.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_31, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 220, 60, 30));
+        jPanel2.add(E_31, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 220, 60, 30));
 
         B4.setBackground(new java.awt.Color(255, 255, 255));
         B4.setText("1000-2000");
@@ -752,47 +794,47 @@ public class Dashboard extends javax.swing.JFrame {
                 B4ActionPerformed(evt);
             }
         });
-        jPanel2.add(B4, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 250, 120, 30));
+        jPanel2.add(B4, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 250, 80, 30));
 
         jCheckBox5.setBackground(new java.awt.Color(217, 141, 129));
         jCheckBox5.setText("2 * 05=0900");
-        jPanel2.add(jCheckBox5, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 250, 129, 30));
+        jPanel2.add(jCheckBox5, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 250, 108, 30));
 
         E_40.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_40.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_40, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 250, 60, 30));
+        jPanel2.add(E_40, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 250, 60, 30));
 
         E_41.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_41.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_41, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 250, 60, 30));
+        jPanel2.add(E_41, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 250, 60, 30));
 
         E_42.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_42.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_42, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 250, 60, 30));
+        jPanel2.add(E_42, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 250, 60, 30));
 
         E_43.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_43.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_43, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 250, 60, 30));
+        jPanel2.add(E_43, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 250, 60, 30));
 
         E_44.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_44.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_44, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 250, 60, 30));
+        jPanel2.add(E_44, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 250, 60, 30));
 
         E_45.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_45.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_45, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 250, 60, 30));
+        jPanel2.add(E_45, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 250, 60, 30));
 
         E_46.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_46.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_46, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 250, 60, 30));
+        jPanel2.add(E_46, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 250, 60, 30));
 
         E_47.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_47.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_47, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 250, 60, 30));
+        jPanel2.add(E_47, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 250, 60, 30));
 
         E_48.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_48.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_48, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 250, 60, 30));
+        jPanel2.add(E_48, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 250, 60, 30));
 
         E_49.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_49.setMinimumSize(new java.awt.Dimension(10, 32));
@@ -801,7 +843,7 @@ public class Dashboard extends javax.swing.JFrame {
                 E_49ActionPerformed(evt);
             }
         });
-        jPanel2.add(E_49, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 250, 60, 30));
+        jPanel2.add(E_49, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 250, 60, 30));
 
         I_40.setBackground(new java.awt.Color(113, 232, 244));
         I_40.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -811,7 +853,7 @@ public class Dashboard extends javax.swing.JFrame {
                 I_40KeyReleased(evt);
             }
         });
-        jPanel2.add(I_40, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 250, 60, 30));
+        jPanel2.add(I_40, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 250, 60, 30));
 
         B5.setBackground(new java.awt.Color(255, 255, 255));
         B5.setText("1000-2000");
@@ -821,31 +863,31 @@ public class Dashboard extends javax.swing.JFrame {
                 B5ActionPerformed(evt);
             }
         });
-        jPanel2.add(B5, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 280, 120, 30));
+        jPanel2.add(B5, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 280, 80, 30));
 
         E_50.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_50.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_50, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 280, 60, 30));
+        jPanel2.add(E_50, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 280, 60, 30));
 
         jCheckBox6.setBackground(new java.awt.Color(185, 177, 230));
         jCheckBox6.setText("2 * 05=0900");
-        jPanel2.add(jCheckBox6, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 280, 129, 30));
+        jPanel2.add(jCheckBox6, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 280, 108, 30));
 
         E_56.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_56.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_56, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 280, 60, 30));
+        jPanel2.add(E_56, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 280, 60, 30));
 
         E_52.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_52.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_52, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 280, 60, 30));
+        jPanel2.add(E_52, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 280, 60, 30));
 
         E_53.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_53.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_53, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 280, 60, 30));
+        jPanel2.add(E_53, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 280, 60, 30));
 
         E_59.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_59.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_59, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 280, 60, 30));
+        jPanel2.add(E_59, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 280, 60, 30));
 
         I_50.setBackground(new java.awt.Color(113, 232, 244));
         I_50.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -855,63 +897,63 @@ public class Dashboard extends javax.swing.JFrame {
                 I_50KeyReleased(evt);
             }
         });
-        jPanel2.add(I_50, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 280, 60, 30));
+        jPanel2.add(I_50, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 280, 60, 30));
 
         E_54.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_54.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_54, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 280, 60, 30));
+        jPanel2.add(E_54, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 280, 60, 30));
 
         E_57.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_57.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_57, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 280, 60, 30));
+        jPanel2.add(E_57, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 280, 60, 30));
 
         E_55.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_55.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_55, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 280, 60, 30));
+        jPanel2.add(E_55, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 280, 60, 30));
 
         E_51.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_51.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_51, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 280, 60, 30));
+        jPanel2.add(E_51, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 280, 60, 30));
 
         E_58.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_58.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_58, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 280, 60, 30));
+        jPanel2.add(E_58, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 280, 60, 30));
 
         E_63.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_63.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_63, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 310, 60, 30));
+        jPanel2.add(E_63, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 310, 60, 30));
 
         E_68.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_68.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_68, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 310, 60, 30));
+        jPanel2.add(E_68, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 310, 60, 30));
 
         E_60.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_60.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_60, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 310, 60, 30));
+        jPanel2.add(E_60, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 310, 60, 30));
 
         jCheckBox7.setBackground(new java.awt.Color(234, 158, 123));
         jCheckBox7.setText("2 * 10=1800");
-        jPanel2.add(jCheckBox7, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 310, 129, 30));
+        jPanel2.add(jCheckBox7, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 310, 108, 30));
 
         E_62.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_62.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_62, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 310, 60, 30));
+        jPanel2.add(E_62, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 310, 60, 30));
 
         E_69.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_69.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_69, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 310, 60, 30));
+        jPanel2.add(E_69, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 310, 60, 30));
 
         E_61.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_61.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_61, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 310, 60, 30));
+        jPanel2.add(E_61, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 310, 60, 30));
 
         E_65.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_65.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_65, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 310, 60, 30));
+        jPanel2.add(E_65, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 310, 60, 30));
 
         E_64.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_64.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_64, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 310, 60, 30));
+        jPanel2.add(E_64, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 310, 60, 30));
 
         B6.setBackground(new java.awt.Color(255, 255, 255));
         B6.setText("1000-2000");
@@ -921,11 +963,11 @@ public class Dashboard extends javax.swing.JFrame {
                 B6ActionPerformed(evt);
             }
         });
-        jPanel2.add(B6, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 310, 120, 30));
+        jPanel2.add(B6, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 310, 80, 30));
 
         E_67.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_67.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_67, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 310, 60, 30));
+        jPanel2.add(E_67, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 310, 60, 30));
 
         I_60.setBackground(new java.awt.Color(113, 232, 244));
         I_60.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -935,27 +977,27 @@ public class Dashboard extends javax.swing.JFrame {
                 I_60KeyReleased(evt);
             }
         });
-        jPanel2.add(I_60, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 310, 60, 30));
+        jPanel2.add(I_60, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 310, 60, 30));
 
         E_66.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_66.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_66, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 310, 60, 30));
+        jPanel2.add(E_66, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 310, 60, 30));
 
         E_73.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_73.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_73, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 340, 60, 30));
+        jPanel2.add(E_73, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 340, 60, 30));
 
         E_75.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_75.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_75, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 340, 60, 30));
+        jPanel2.add(E_75, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 340, 60, 30));
 
         E_70.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_70.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_70, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 340, 60, 30));
+        jPanel2.add(E_70, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 340, 60, 30));
 
         jCheckBox8.setBackground(new java.awt.Color(164, 204, 90));
         jCheckBox8.setText("2 * 20=3600");
-        jPanel2.add(jCheckBox8, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 340, 129, 30));
+        jPanel2.add(jCheckBox8, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 340, 108, 30));
 
         B7.setBackground(new java.awt.Color(255, 255, 255));
         B7.setText("1000-2000");
@@ -965,23 +1007,23 @@ public class Dashboard extends javax.swing.JFrame {
                 B7ActionPerformed(evt);
             }
         });
-        jPanel2.add(B7, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 340, 120, 30));
+        jPanel2.add(B7, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 340, 80, 30));
 
         E_77.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_77.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_77, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 340, 60, 30));
+        jPanel2.add(E_77, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 340, 60, 30));
 
         E_72.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_72.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_72, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 340, 60, 30));
+        jPanel2.add(E_72, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 340, 60, 30));
 
         E_71.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_71.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_71, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 340, 60, 30));
+        jPanel2.add(E_71, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 340, 60, 30));
 
         E_74.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_74.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_74, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 340, 60, 30));
+        jPanel2.add(E_74, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 340, 60, 30));
 
         I_70.setBackground(new java.awt.Color(113, 232, 244));
         I_70.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -991,19 +1033,19 @@ public class Dashboard extends javax.swing.JFrame {
                 I_70KeyReleased(evt);
             }
         });
-        jPanel2.add(I_70, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 340, 60, 30));
+        jPanel2.add(I_70, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 340, 60, 30));
 
         E_78.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_78.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_78, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 340, 60, 30));
+        jPanel2.add(E_78, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 340, 60, 30));
 
         E_79.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_79.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_79, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 340, 60, 30));
+        jPanel2.add(E_79, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 340, 60, 30));
 
         E_76.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_76.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_76, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 340, 60, 30));
+        jPanel2.add(E_76, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 340, 60, 30));
 
         B8.setBackground(new java.awt.Color(255, 255, 255));
         B8.setText("1000-2000");
@@ -1013,51 +1055,51 @@ public class Dashboard extends javax.swing.JFrame {
                 B8ActionPerformed(evt);
             }
         });
-        jPanel2.add(B8, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 370, 120, 30));
+        jPanel2.add(B8, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 370, 80, 30));
 
         E_85.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_85.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_85, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 370, 60, 30));
+        jPanel2.add(E_85, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 370, 60, 30));
 
         E_89.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_89.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_89, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 370, 60, 30));
+        jPanel2.add(E_89, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 370, 60, 30));
 
         E_87.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_87.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_87, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 370, 60, 30));
+        jPanel2.add(E_87, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 370, 60, 30));
 
         jCheckBox9.setBackground(new java.awt.Color(201, 189, 175));
         jCheckBox9.setText("2 * 25=4500");
-        jPanel2.add(jCheckBox9, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 370, 129, 30));
+        jPanel2.add(jCheckBox9, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 370, 108, 30));
 
         E_86.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_86.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_86, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 370, 60, 30));
+        jPanel2.add(E_86, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 370, 60, 30));
 
         E_81.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_81.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_81, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 370, 60, 30));
+        jPanel2.add(E_81, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 370, 60, 30));
 
         E_80.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_80.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_80, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 370, 60, 30));
+        jPanel2.add(E_80, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 370, 60, 30));
 
         E_83.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_83.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_83, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 370, 60, 30));
+        jPanel2.add(E_83, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 370, 60, 30));
 
         E_88.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_88.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_88, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 370, 60, 30));
+        jPanel2.add(E_88, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 370, 60, 30));
 
         E_82.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_82.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_82, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 370, 60, 30));
+        jPanel2.add(E_82, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 370, 60, 30));
 
         E_84.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_84.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_84, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 370, 60, 30));
+        jPanel2.add(E_84, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 370, 60, 30));
 
         I_80.setBackground(new java.awt.Color(113, 232, 244));
         I_80.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -1067,51 +1109,51 @@ public class Dashboard extends javax.swing.JFrame {
                 I_80KeyReleased(evt);
             }
         });
-        jPanel2.add(I_80, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 370, 60, 30));
+        jPanel2.add(I_80, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 370, 60, 30));
 
         E_99.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_99.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_99, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 400, 60, 30));
+        jPanel2.add(E_99, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 400, 60, 30));
 
         E_93.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_93.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_93, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 400, 60, 30));
+        jPanel2.add(E_93, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 400, 60, 30));
 
         E_91.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_91.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_91, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 400, 60, 30));
+        jPanel2.add(E_91, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 400, 60, 30));
 
         E_96.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_96.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_96, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 400, 60, 30));
+        jPanel2.add(E_96, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 400, 60, 30));
 
         E_98.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_98.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_98, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 400, 60, 30));
+        jPanel2.add(E_98, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 400, 60, 30));
 
         E_97.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_97.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_97, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 400, 60, 30));
+        jPanel2.add(E_97, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 400, 60, 30));
 
         jCheckBox10.setBackground(new java.awt.Color(23, 188, 189));
         jCheckBox10.setText("2 * 25=4500");
-        jPanel2.add(jCheckBox10, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 400, 129, 30));
+        jPanel2.add(jCheckBox10, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 400, 108, 30));
 
         E_94.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_94.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_94, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 400, 60, 30));
+        jPanel2.add(E_94, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 400, 60, 30));
 
         E_92.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_92.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_92, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 400, 60, 30));
+        jPanel2.add(E_92, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 400, 60, 30));
 
         E_95.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_95.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_95, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 400, 60, 30));
+        jPanel2.add(E_95, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 400, 60, 30));
 
         E_90.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         E_90.setMinimumSize(new java.awt.Dimension(10, 32));
-        jPanel2.add(E_90, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 400, 60, 30));
+        jPanel2.add(E_90, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 400, 60, 30));
 
         B9.setBackground(new java.awt.Color(255, 255, 255));
         B9.setText("1000-2000");
@@ -1121,7 +1163,7 @@ public class Dashboard extends javax.swing.JFrame {
                 B9ActionPerformed(evt);
             }
         });
-        jPanel2.add(B9, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 400, 120, 30));
+        jPanel2.add(B9, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 400, 80, 30));
 
         I_90.setBackground(new java.awt.Color(113, 232, 244));
         I_90.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -1131,7 +1173,7 @@ public class Dashboard extends javax.swing.JFrame {
                 I_90KeyReleased(evt);
             }
         });
-        jPanel2.add(I_90, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 400, 60, 30));
+        jPanel2.add(I_90, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 400, 60, 30));
 
         BALL.setBackground(new java.awt.Color(255, 255, 255));
         BALL.setText("All Series");
@@ -1142,7 +1184,7 @@ public class Dashboard extends javax.swing.JFrame {
                 BALLActionPerformed(evt);
             }
         });
-        jPanel2.add(BALL, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 430, 120, 30));
+        jPanel2.add(BALL, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 430, 80, 30));
 
         B_0.setBackground(new java.awt.Color(113, 232, 244));
         B_0.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -1157,7 +1199,7 @@ public class Dashboard extends javax.swing.JFrame {
                 B_0KeyReleased(evt);
             }
         });
-        jPanel2.add(B_0, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 430, 60, 30));
+        jPanel2.add(B_0, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 430, 60, 30));
 
         B_1.setBackground(new java.awt.Color(113, 232, 244));
         B_1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -1167,7 +1209,7 @@ public class Dashboard extends javax.swing.JFrame {
                 B_1KeyReleased(evt);
             }
         });
-        jPanel2.add(B_1, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 430, 60, 30));
+        jPanel2.add(B_1, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 430, 60, 30));
 
         B_2.setBackground(new java.awt.Color(113, 232, 244));
         B_2.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -1177,7 +1219,7 @@ public class Dashboard extends javax.swing.JFrame {
                 B_2KeyReleased(evt);
             }
         });
-        jPanel2.add(B_2, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 430, 60, 30));
+        jPanel2.add(B_2, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 430, 60, 30));
 
         B_3.setBackground(new java.awt.Color(113, 232, 244));
         B_3.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -1187,7 +1229,7 @@ public class Dashboard extends javax.swing.JFrame {
                 B_3KeyReleased(evt);
             }
         });
-        jPanel2.add(B_3, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 430, 60, 30));
+        jPanel2.add(B_3, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 430, 60, 30));
 
         B_4.setBackground(new java.awt.Color(113, 232, 244));
         B_4.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -1197,7 +1239,7 @@ public class Dashboard extends javax.swing.JFrame {
                 B_4KeyReleased(evt);
             }
         });
-        jPanel2.add(B_4, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 430, 60, 30));
+        jPanel2.add(B_4, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 430, 60, 30));
 
         B_5.setBackground(new java.awt.Color(113, 232, 244));
         B_5.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -1207,7 +1249,7 @@ public class Dashboard extends javax.swing.JFrame {
                 B_5KeyReleased(evt);
             }
         });
-        jPanel2.add(B_5, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 430, 60, 30));
+        jPanel2.add(B_5, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 430, 60, 30));
 
         B_6.setBackground(new java.awt.Color(113, 232, 244));
         B_6.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -1217,7 +1259,7 @@ public class Dashboard extends javax.swing.JFrame {
                 B_6KeyReleased(evt);
             }
         });
-        jPanel2.add(B_6, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 430, 60, 30));
+        jPanel2.add(B_6, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 430, 60, 30));
 
         B_7.setBackground(new java.awt.Color(113, 232, 244));
         B_7.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -1227,7 +1269,7 @@ public class Dashboard extends javax.swing.JFrame {
                 B_7KeyReleased(evt);
             }
         });
-        jPanel2.add(B_7, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 430, 60, 30));
+        jPanel2.add(B_7, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 430, 60, 30));
 
         B_8.setBackground(new java.awt.Color(113, 232, 244));
         B_8.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -1237,7 +1279,7 @@ public class Dashboard extends javax.swing.JFrame {
                 B_8KeyReleased(evt);
             }
         });
-        jPanel2.add(B_8, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 430, 60, 30));
+        jPanel2.add(B_8, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 430, 60, 30));
 
         B_9.setBackground(new java.awt.Color(113, 232, 244));
         B_9.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -1252,150 +1294,151 @@ public class Dashboard extends javax.swing.JFrame {
                 B_9KeyReleased(evt);
             }
         });
-        jPanel2.add(B_9, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 430, 60, 30));
+        jPanel2.add(B_9, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 430, 60, 30));
 
         jLabel16.setBackground(new java.awt.Color(100, 63, 250));
         jLabel16.setFont(new java.awt.Font("Manjari Bold", 1, 8)); // NOI18N
         jLabel16.setForeground(new java.awt.Color(35, 16, 16));
-        jLabel16.setText("LUCKY NUMBERS");
-        jPanel2.add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 430, 130, 30));
+        jLabel16.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel16.setText("LUCKY NUM");
+        jPanel2.add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 430, 108, 30));
 
         Q1000_1900.setEditable(false);
         Q1000_1900.setBackground(new java.awt.Color(76, 240, 155));
         Q1000_1900.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
         Q1000_1900.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jPanel2.add(Q1000_1900, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 130, 120, 30));
+        jPanel2.add(Q1000_1900, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 130, 80, 30));
 
         A1000_1900.setEditable(false);
         A1000_1900.setBackground(new java.awt.Color(244, 254, 164));
         A1000_1900.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
         A1000_1900.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jPanel2.add(A1000_1900, new org.netbeans.lib.awtextra.AbsoluteConstraints(1040, 130, 120, 30));
+        jPanel2.add(A1000_1900, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 130, 80, 30));
 
         Q2000_2900.setEditable(false);
         Q2000_2900.setBackground(new java.awt.Color(76, 240, 155));
         Q2000_2900.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
         Q2000_2900.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jPanel2.add(Q2000_2900, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 160, 120, 30));
+        jPanel2.add(Q2000_2900, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 160, 80, 30));
 
         A2000_2900.setEditable(false);
         A2000_2900.setBackground(new java.awt.Color(244, 254, 164));
         A2000_2900.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
         A2000_2900.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jPanel2.add(A2000_2900, new org.netbeans.lib.awtextra.AbsoluteConstraints(1040, 160, 120, 30));
+        jPanel2.add(A2000_2900, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 160, 80, 30));
 
         Q3000_3900.setEditable(false);
         Q3000_3900.setBackground(new java.awt.Color(76, 240, 155));
         Q3000_3900.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
         Q3000_3900.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jPanel2.add(Q3000_3900, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 190, 120, 30));
+        jPanel2.add(Q3000_3900, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 190, 80, 30));
 
         A3000_3900.setEditable(false);
         A3000_3900.setBackground(new java.awt.Color(244, 254, 164));
         A3000_3900.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
         A3000_3900.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jPanel2.add(A3000_3900, new org.netbeans.lib.awtextra.AbsoluteConstraints(1040, 190, 120, 30));
+        jPanel2.add(A3000_3900, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 190, 80, 30));
 
         Q4000_4900.setEditable(false);
         Q4000_4900.setBackground(new java.awt.Color(76, 240, 155));
         Q4000_4900.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
         Q4000_4900.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jPanel2.add(Q4000_4900, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 220, 120, 30));
+        jPanel2.add(Q4000_4900, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 220, 80, 30));
 
         A4000_4900.setEditable(false);
         A4000_4900.setBackground(new java.awt.Color(244, 254, 164));
         A4000_4900.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
         A4000_4900.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jPanel2.add(A4000_4900, new org.netbeans.lib.awtextra.AbsoluteConstraints(1040, 220, 120, 30));
+        jPanel2.add(A4000_4900, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 220, 80, 30));
 
         Q5000_5900.setEditable(false);
         Q5000_5900.setBackground(new java.awt.Color(76, 240, 155));
         Q5000_5900.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
         Q5000_5900.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jPanel2.add(Q5000_5900, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 250, 120, 30));
+        jPanel2.add(Q5000_5900, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 250, 80, 30));
 
         A5000_5900.setEditable(false);
         A5000_5900.setBackground(new java.awt.Color(244, 254, 164));
         A5000_5900.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
         A5000_5900.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jPanel2.add(A5000_5900, new org.netbeans.lib.awtextra.AbsoluteConstraints(1040, 250, 120, 30));
+        jPanel2.add(A5000_5900, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 250, 80, 30));
 
         Q6000_6900.setEditable(false);
         Q6000_6900.setBackground(new java.awt.Color(76, 240, 155));
         Q6000_6900.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
         Q6000_6900.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jPanel2.add(Q6000_6900, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 280, 120, 30));
+        jPanel2.add(Q6000_6900, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 280, 80, 30));
 
         A6000_6900.setEditable(false);
         A6000_6900.setBackground(new java.awt.Color(244, 254, 164));
         A6000_6900.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
         A6000_6900.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jPanel2.add(A6000_6900, new org.netbeans.lib.awtextra.AbsoluteConstraints(1040, 280, 120, 30));
+        jPanel2.add(A6000_6900, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 280, 80, 30));
 
         Q7000_7900.setEditable(false);
         Q7000_7900.setBackground(new java.awt.Color(76, 240, 155));
         Q7000_7900.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
         Q7000_7900.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jPanel2.add(Q7000_7900, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 310, 120, 30));
+        jPanel2.add(Q7000_7900, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 310, 80, 30));
 
         A7000_7900.setEditable(false);
         A7000_7900.setBackground(new java.awt.Color(244, 254, 164));
         A7000_7900.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
         A7000_7900.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jPanel2.add(A7000_7900, new org.netbeans.lib.awtextra.AbsoluteConstraints(1040, 310, 120, 30));
+        jPanel2.add(A7000_7900, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 310, 80, 30));
 
         Q8000_8900.setEditable(false);
         Q8000_8900.setBackground(new java.awt.Color(76, 240, 155));
         Q8000_8900.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
         Q8000_8900.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jPanel2.add(Q8000_8900, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 340, 120, 30));
+        jPanel2.add(Q8000_8900, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 340, 80, 30));
 
         A8000_8900.setEditable(false);
         A8000_8900.setBackground(new java.awt.Color(244, 254, 164));
         A8000_8900.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
         A8000_8900.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jPanel2.add(A8000_8900, new org.netbeans.lib.awtextra.AbsoluteConstraints(1040, 340, 120, 30));
+        jPanel2.add(A8000_8900, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 340, 80, 30));
 
         Q9000_9900.setEditable(false);
         Q9000_9900.setBackground(new java.awt.Color(76, 240, 155));
         Q9000_9900.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
         Q9000_9900.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jPanel2.add(Q9000_9900, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 370, 120, 30));
+        jPanel2.add(Q9000_9900, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 370, 80, 30));
 
         A9000_9900.setEditable(false);
         A9000_9900.setBackground(new java.awt.Color(244, 254, 164));
         A9000_9900.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
         A9000_9900.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jPanel2.add(A9000_9900, new org.netbeans.lib.awtextra.AbsoluteConstraints(1040, 370, 120, 30));
+        jPanel2.add(A9000_9900, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 370, 80, 30));
 
         Q10000_10900.setEditable(false);
         Q10000_10900.setBackground(new java.awt.Color(76, 240, 155));
         Q10000_10900.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
         Q10000_10900.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jPanel2.add(Q10000_10900, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 400, 120, 30));
+        jPanel2.add(Q10000_10900, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 400, 80, 30));
 
         A10000_10900.setEditable(false);
         A10000_10900.setBackground(new java.awt.Color(244, 254, 164));
         A10000_10900.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
         A10000_10900.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jPanel2.add(A10000_10900, new org.netbeans.lib.awtextra.AbsoluteConstraints(1040, 400, 120, 30));
+        jPanel2.add(A10000_10900, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 400, 80, 30));
 
         totalqty.setEditable(false);
         totalqty.setBackground(new java.awt.Color(76, 240, 155));
         totalqty.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
         totalqty.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jPanel2.add(totalqty, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 430, 120, 30));
+        jPanel2.add(totalqty, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 430, 80, 30));
 
         totalamt.setEditable(false);
         totalamt.setBackground(new java.awt.Color(244, 254, 164));
         totalamt.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
         totalamt.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jPanel2.add(totalamt, new org.netbeans.lib.awtextra.AbsoluteConstraints(1040, 430, 120, 30));
+        jPanel2.add(totalamt, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 430, 80, 30));
 
         buy.setBackground(new java.awt.Color(255, 0, 18));
         buy.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
         buy.setForeground(new java.awt.Color(254, 242, 242));
-        buy.setText("Buy [F6]");
+        buy.setText("Buy");
         buy.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED));
         buy.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1407,15 +1450,15 @@ public class Dashboard extends javax.swing.JFrame {
                 buyKeyPressed(evt);
             }
         });
-        jPanel2.add(buy, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 460, 240, 30));
+        jPanel2.add(buy, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 460, 160, 30));
 
         jLabel7.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
         jLabel7.setText("QTY");
-        jPanel2.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(950, 100, -1, -1));
+        jPanel2.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(880, 100, -1, -1));
 
         jLabel17.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
         jLabel17.setText("AMT ₹ ");
-        jPanel2.add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(1070, 100, -1, -1));
+        jPanel2.add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(950, 100, -1, -1));
 
         fixed.setBackground(new java.awt.Color(255, 255, 255));
         fixed.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
@@ -1425,7 +1468,7 @@ public class Dashboard extends javax.swing.JFrame {
                 fixedActionPerformed(evt);
             }
         });
-        jPanel2.add(fixed, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 100, -1, -1));
+        jPanel2.add(fixed, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 100, -1, -1));
 
         multi.setBackground(new java.awt.Color(255, 255, 255));
         multi.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
@@ -1435,7 +1478,7 @@ public class Dashboard extends javax.swing.JFrame {
                 multiActionPerformed(evt);
             }
         });
-        jPanel2.add(multi, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 100, -1, -1));
+        jPanel2.add(multi, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 100, -1, -1));
 
         odd.setBackground(new java.awt.Color(255, 255, 255));
         odd.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
@@ -1450,7 +1493,7 @@ public class Dashboard extends javax.swing.JFrame {
                 oddActionPerformed(evt);
             }
         });
-        jPanel2.add(odd, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 100, -1, -1));
+        jPanel2.add(odd, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 100, -1, -1));
 
         even.setBackground(new java.awt.Color(255, 255, 255));
         even.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
@@ -1465,7 +1508,7 @@ public class Dashboard extends javax.swing.JFrame {
                 evenActionPerformed(evt);
             }
         });
-        jPanel2.add(even, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 100, -1, -1));
+        jPanel2.add(even, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 100, -1, -1));
 
         cross.setBackground(new java.awt.Color(255, 255, 255));
         cross.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
@@ -1480,29 +1523,29 @@ public class Dashboard extends javax.swing.JFrame {
                 crossActionPerformed(evt);
             }
         });
-        jPanel2.add(cross, new org.netbeans.lib.awtextra.AbsoluteConstraints(730, 100, -1, -1));
+        jPanel2.add(cross, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 100, -1, -1));
 
         NSystems.setEditable(false);
         NSystems.setEnabled(false);
-        jPanel2.add(NSystems, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 100, 50, -1));
+        jPanel2.add(NSystems, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 100, 50, -1));
 
         subSeriesNo.setText("series");
-        jPanel2.add(subSeriesNo, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 100, -1, -1));
+        jPanel2.add(subSeriesNo, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, -1, -1));
 
         CMulti.setText("m");
-        jPanel2.add(CMulti, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 100, -1, -1));
+        jPanel2.add(CMulti, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 0, -1, -1));
 
         alls.setText("alls");
-        jPanel2.add(alls, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 100, -1, -1));
+        jPanel2.add(alls, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 0, -1, -1));
 
         start.setText("jTextField1");
-        jPanel2.add(start, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 100, -1, -1));
+        jPanel2.add(start, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 100, -1, -1));
 
         end.setText("jTextField2");
-        jPanel2.add(end, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 100, -1, -1));
+        jPanel2.add(end, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 100, -1, -1));
 
         advance.setText("false");
-        jPanel2.add(advance, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 100, -1, -1));
+        jPanel2.add(advance, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 0, -1, -1));
 
         jPanel3.setBackground(new java.awt.Color(250, 244, 154));
         jPanel3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -1511,78 +1554,78 @@ public class Dashboard extends javax.swing.JFrame {
         jLabel4.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(216, 43, 43));
         jLabel4.setText("Dr. Date");
-        jPanel3.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 0, -1, -1));
+        jPanel3.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 0, -1, -1));
 
         drawClock.setFont(new java.awt.Font("Monospaced", 1, 20)); // NOI18N
         drawClock.setForeground(new java.awt.Color(255, 0, 0));
         drawClock.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         drawClock.setText("00:02:33");
         drawClock.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        jPanel3.add(drawClock, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 30, 140, -1));
+        jPanel3.add(drawClock, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 30, 140, -1));
 
         jLabel5.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(216, 43, 43));
         jLabel5.setText("Time To Dr.");
-        jPanel3.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 0, -1, 20));
+        jPanel3.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 0, -1, 20));
 
         jLabel6.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(216, 43, 43));
         jLabel6.setText("Dr. Time");
-        jPanel3.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 0, -1, -1));
+        jPanel3.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 0, -1, -1));
 
         dTime.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
         dTime.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         dTime.setText("03:20 PM");
-        jPanel3.add(dTime, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 30, 110, -1));
+        jPanel3.add(dTime, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 30, 110, -1));
 
         cDate.setFont(new java.awt.Font("Ubuntu", 1, 20)); // NOI18N
         cDate.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         cDate.setText("05-01-2020");
-        jPanel3.add(cDate, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 30, 110, -1));
+        jPanel3.add(cDate, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 30, 110, -1));
 
-        jPanel2.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 36, 440, 60));
+        jPanel2.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 36, 370, 60));
 
         account.setBackground(new java.awt.Color(141, 235, 237));
         account.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
         account.setForeground(new java.awt.Color(1, 1, 1));
         account.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         account.setText("Account");
-        account.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        jPanel2.add(account, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 10, 120, 26));
+        account.setBorder(null);
+        jPanel2.add(account, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 10, 90, 26));
 
         operator.setBackground(new java.awt.Color(141, 235, 237));
         operator.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
         operator.setForeground(new java.awt.Color(1, 1, 1));
         operator.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         operator.setText("Operator");
-        operator.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        jPanel2.add(operator, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 10, 100, 26));
+        operator.setBorder(null);
+        jPanel2.add(operator, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 10, 90, 26));
 
         reprint.setBackground(new java.awt.Color(141, 235, 237));
         reprint.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
         reprint.setForeground(new java.awt.Color(1, 1, 1));
         reprint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         reprint.setText("Reprint");
-        reprint.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        reprint.setBorder(null);
         reprint.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 reprintMouseClicked(evt);
             }
         });
-        jPanel2.add(reprint, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 10, 100, 26));
+        jPanel2.add(reprint, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 10, 90, 26));
 
         cancel.setBackground(new java.awt.Color(141, 235, 237));
         cancel.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
         cancel.setForeground(new java.awt.Color(1, 1, 1));
         cancel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         cancel.setText("Cancel");
-        cancel.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        cancel.setBorder(null);
         cancel.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 cancelMouseClicked(evt);
             }
         });
-        jPanel2.add(cancel, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 10, 100, 26));
+        jPanel2.add(cancel, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 10, 90, 26));
 
         jPanel4.setBackground(new java.awt.Color(250, 244, 154));
         jPanel4.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -1590,17 +1633,17 @@ public class Dashboard extends javax.swing.JFrame {
 
         jLabel2.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel2.setText("Limit Update");
+        jLabel2.setText("BALANCE");
         jLabel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 1, 0)));
-        jPanel4.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 120, 26));
+        jPanel4.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 90, 26));
 
         balance.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
         balance.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         balance.setText("*****");
         balance.setBorder(javax.swing.BorderFactory.createCompoundBorder());
-        jPanel4.add(balance, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 30, 110, 26));
+        jPanel4.add(balance, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 30, 80, 26));
 
-        jPanel2.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 36, -1, 60));
+        jPanel2.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 36, 90, 60));
 
         jPanel5.setBackground(new java.awt.Color(250, 244, 154));
         jPanel5.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -1617,7 +1660,7 @@ public class Dashboard extends javax.swing.JFrame {
         last.setText("ask5e8dc8429f16f");
         jPanel5.add(last, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 30, 150, 30));
 
-        jPanel2.add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(880, 36, 150, 60));
+        jPanel2.add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 36, 150, 60));
 
         jPanel6.setBackground(new java.awt.Color(250, 244, 154));
         jPanel6.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -1633,7 +1676,7 @@ public class Dashboard extends javax.swing.JFrame {
         lastamt.setText("Rs. 60.00");
         jPanel6.add(lastamt, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 30, 130, -1));
 
-        jPanel2.add(jPanel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 36, 130, 60));
+        jPanel2.add(jPanel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(890, 36, 130, 60));
 
         jButton1.setBackground(new java.awt.Color(227, 227, 62));
         jButton1.setText("Result Update");
@@ -1642,10 +1685,13 @@ public class Dashboard extends javax.swing.JFrame {
                 jButton1ActionPerformed(evt);
             }
         });
-        jPanel2.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 0, 170, 40));
+        jPanel2.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 0, 160, 38));
 
         printerPanel.setBackground(new java.awt.Color(255, 255, 255));
-        printerPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Select Printer"));
+        printerPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Selected Printer"));
+
+        printer.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
+        printer.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 
         javax.swing.GroupLayout printerPanelLayout = new javax.swing.GroupLayout(printerPanel);
         printerPanel.setLayout(printerPanelLayout);
@@ -1655,32 +1701,45 @@ public class Dashboard extends javax.swing.JFrame {
         );
         printerPanelLayout.setVerticalGroup(
             printerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, printerPanelLayout.createSequentialGroup()
-                .addGap(0, 54, Short.MAX_VALUE)
-                .addComponent(printer, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addComponent(printer, javax.swing.GroupLayout.DEFAULT_SIZE, 32, Short.MAX_VALUE)
         );
 
-        jPanel2.add(printerPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 138, 95));
+        jPanel2.add(printerPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, 138, 55));
 
-        rBox.setBackground(new java.awt.Color(141, 235, 237));
-        rBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Result", "Today Result", "Past Result" }));
-        rBox.setAutoscrolls(true);
-        rBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        rBox.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        rBox.setDebugGraphicsOptions(javax.swing.DebugGraphics.NONE_OPTION);
-        rBox.setEditor(null);
-        rBox.setFocusCycleRoot(true);
-        rBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                rBoxActionPerformed(evt);
+        messagePanel.setBackground(new java.awt.Color(255, 255, 255));
+        messagePanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+
+        javax.swing.GroupLayout messagePanelLayout = new javax.swing.GroupLayout(messagePanel);
+        messagePanel.setLayout(messagePanelLayout);
+        messagePanelLayout.setHorizontalGroup(
+            messagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 908, Short.MAX_VALUE)
+        );
+        messagePanelLayout.setVerticalGroup(
+            messagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 33, Short.MAX_VALUE)
+        );
+
+        jPanel2.add(messagePanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 460, 910, 35));
+
+        result.setBackground(new java.awt.Color(141, 235, 237));
+        result.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
+        result.setForeground(new java.awt.Color(1, 1, 1));
+        result.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        result.setText("Result");
+        result.setBorder(null);
+        result.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                resultMouseClicked(evt);
             }
         });
-        jPanel2.add(rBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 10, 120, -1));
+        jPanel2.add(result, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 10, 90, 26));
 
-        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 100, 1170, 500));
+        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 100, 1030, 500));
 
         jPanel13.setBackground(new java.awt.Color(255, 255, 255));
         jPanel13.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jPanel13.setAutoscrolls(true);
         jPanel13.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         claimReader.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -1691,7 +1750,7 @@ public class Dashboard extends javax.swing.JFrame {
                 claimReaderKeyReleased(evt);
             }
         });
-        jPanel13.add(claimReader, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 5, 163, 35));
+        jPanel13.add(claimReader, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 5, 200, 35));
 
         b1.setBackground(new java.awt.Color(109, 106, 225));
         b1.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
@@ -1742,36 +1801,25 @@ public class Dashboard extends javax.swing.JFrame {
 
         jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/mobile-phone-signal-strength.png"))); // NOI18N
-        jPanel13.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(1110, 0, 48, 43));
+        jPanel13.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(975, 0, 48, 43));
 
-        jPanel1.add(jPanel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 600, 1170, 45));
+        jPanel1.add(jPanel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 600, 1030, 45));
 
         resultPane.setBackground(new java.awt.Color(254, 254, 254));
         resultPane.setAutoscrolls(true);
-
-        result.setBackground(new java.awt.Color(141, 235, 237));
-        result.setFont(new java.awt.Font("Monospaced", 1, 14)); // NOI18N
-        result.setForeground(new java.awt.Color(1, 1, 1));
-        result.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        result.setText("Result");
-        result.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
         javax.swing.GroupLayout resultPaneLayout = new javax.swing.GroupLayout(resultPane);
         resultPane.setLayout(resultPaneLayout);
         resultPaneLayout.setHorizontalGroup(
             resultPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(resultPaneLayout.createSequentialGroup()
-                .addComponent(result, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 710, Short.MAX_VALUE))
+            .addGap(0, 690, Short.MAX_VALUE)
         );
         resultPaneLayout.setVerticalGroup(
             resultPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, resultPaneLayout.createSequentialGroup()
-                .addGap(0, 74, Short.MAX_VALUE)
-                .addComponent(result, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGap(0, 100, Short.MAX_VALUE)
         );
 
-        jPanel1.add(resultPane, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 0, 830, 100));
+        jPanel1.add(resultPane, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 0, 690, 100));
 
         imagePanel.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -1834,18 +1882,7 @@ public class Dashboard extends javax.swing.JFrame {
         jLabel8.setText("Software Version 1.0");
         jPanel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 70, -1, 30));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 0, 0)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+        getContentPane().add(jPanel1, "card2");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -2428,6 +2465,7 @@ public class Dashboard extends javax.swing.JFrame {
         // TODO add your handling code here:
         resultBoard("ALL");
         resetAll();
+        setMessageBar();
     }//GEN-LAST:event_b2ActionPerformed
 
     private void B_0ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_B_0ActionPerformed
@@ -2486,36 +2524,6 @@ public class Dashboard extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void rBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rBoxActionPerformed
-        // TODO add your handling code here:
-        ResultWed rw = new ResultWed();
-        switch (rBox.getSelectedItem().toString()) {
-            case "Today Result":
-                Thread resutlToday = new Thread() {
-                    @Override
-                    public void run() {
-                        rw.showResult();
-                    }
-                };
-                resutlToday.start();
-
-                break;
-            case "Past Result":
-//                new Result().setVisible(true);
-                Thread resultP = new Thread() {
-                    @Override
-                    public void run() {
-                        rw.showResult();
-                    }
-                };
-                resultP.start();
-                break;
-            default:
-                break;
-        }
-        rBox.setSelectedIndex(0);
-    }//GEN-LAST:event_rBoxActionPerformed
-
     private void reprintMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_reprintMouseClicked
         // TODO add your handling code here:
         new tickets("Print").setVisible(true);
@@ -2539,6 +2547,18 @@ public class Dashboard extends javax.swing.JFrame {
     private void claimReaderKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_claimReaderKeyPressed
         // TODO add your handling code here:
     }//GEN-LAST:event_claimReaderKeyPressed
+
+    private void resultMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_resultMouseClicked
+        // TODO add your handling code here:
+        Thread resutlToday = new Thread() {
+            @Override
+            public void run() {
+                ResultWed rw = new ResultWed();
+                rw.showResult();
+            }
+        };
+        resutlToday.start();
+    }//GEN-LAST:event_resultMouseClicked
 
     /**
      * @param args the command line arguments
@@ -2571,7 +2591,7 @@ public class Dashboard extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Dashboard("").setVisible(true);
+                new Dashboard("", "PDF").setVisible(true);
             }
         });
     }
@@ -2789,13 +2809,13 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel8;
     private javax.swing.JLabel last;
     private javax.swing.JLabel lastamt;
+    private javax.swing.JPanel messagePanel;
     public static final javax.swing.JCheckBox multi = new javax.swing.JCheckBox();
     private javax.swing.JCheckBox odd;
     private javax.swing.JLabel operator;
     private javax.swing.JLabel password;
     public static javax.swing.JLabel printer;
     private javax.swing.JPanel printerPanel;
-    private javax.swing.JComboBox rBox;
     private javax.swing.JLabel reprint;
     private javax.swing.JLabel result;
     public static javax.swing.JPanel resultPane;
@@ -3059,14 +3079,30 @@ public class Dashboard extends javax.swing.JFrame {
         JOptionPane.showMessageDialog(null, "Simple Information Message" + str);
     }
 
+    public void messageRefreshThread() {
+        try {
+            Thread msgThread = new Thread() {
+                @Override
+                public void run() {
+                    setMessageBar();
+                }
+            };
+            msgThread.start();
+        } catch (Exception ex) {
+
+        }
+    }
+
     public void setMessageBar() {
         try {
+
+            messagePanel.removeAll();
+            messagePanel.repaint();
             String data = httpAPI._jsonRequest("?r=message", "");
-            //System.out.println("Message: " + data);
             JLabel myLable = new MarqueeLabel(data, MarqueeLabel.RIGHT_TO_LEFT, 20);
             myLable.setForeground(Color.red);
-            myLable.setBounds(10, 460, 800, 30);
-            jPanel2.add(myLable);
+            myLable.setBounds(10, 10, 600, 30);
+            messagePanel.add(myLable);
 
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
@@ -3649,12 +3685,11 @@ public class Dashboard extends javax.swing.JFrame {
 
     public void inputSystem(int p, JTextField jf) {
         try {
+            placeholder = jf.getText();
             if (multi.isSelected()) {
                 if ("".equals(subSeriesNo.getText()) && Dashboard.multiSeries.size() <= 0) {
                     JOptionPane.showMessageDialog(null, "Please select sereis first");
-
                 } else {
-
                     String index = "" + p;
                     int tQty = 0;
                     int tPoint = 0;
@@ -3666,12 +3701,13 @@ public class Dashboard extends javax.swing.JFrame {
                             String K;
                             for (int i = 0; i < numb.size(); i++) {
                                 K = numb.get(i);
-                               // System.out.println("Cross K " + K);
+                                // System.out.println("Cross K " + K);
                                 JTextField temp = jField.get("E_" + K);
                                 temp.setText(jf.getText());
-                                temp.setBackground(Color.yellow);
+                                temp.setBackground(Color.green);
                                 index = "" + K;
                                 tQty = tQty + Integer.parseInt(jf.getText());
+
                                 Dashboard.setNumberMulti(index, jf.getText(), seriesLable.getText(), subSeriesNo.getText(), alls.getText());
 
                             }
@@ -3682,20 +3718,20 @@ public class Dashboard extends javax.swing.JFrame {
 
                                 Map<String, String> jString = new HashMap<>();
                                 JTextField temp = jField.get("E_" + p);
-                                temp.setBackground(Color.yellow);
+                                temp.setBackground(Color.green);
                                 jString.put("num", p + "");
                                 Gson gson = new GsonBuilder().setPrettyPrinting().create();
                                 String jsonEmp = gson.toJson(jString);
                                 //System.out.println(jsonEmp);
                                 String data = httpAPI._jsonRequest("?r=fpNumber", jsonEmp);
-                               // System.out.println(data);
+                                // System.out.println(data);
                                 JSONObject myResponse = new JSONObject(data);
 
                                 int so = 1;
                                 while (so <= myResponse.length()) {
                                     JTextField temdp = jField.get("E_" + myResponse.getString("" + so));
                                     temdp.setText(jf.getText());
-                                    temdp.setBackground(Color.yellow);
+                                    temdp.setBackground(Color.green);
                                     Dashboard.setNumberMulti(myResponse.getString("" + so), temdp.getText(), seriesLable.getText(), subSeriesNo.getText(), alls.getText());
                                     so++;
                                 }
@@ -3707,7 +3743,7 @@ public class Dashboard extends javax.swing.JFrame {
                         default:
                             index = "" + p;
                             JTextField temp = jField.get("E_" + p);
-                            temp.setBackground(Color.yellow);
+                            temp.setBackground(Color.green);
                             Dashboard.setNumberMulti(index, temp.getText(), seriesLable.getText(), subSeriesNo.getText(), alls.getText());
                             break;
                     }
@@ -3729,7 +3765,7 @@ public class Dashboard extends javax.swing.JFrame {
                             K = numb.get(i);
                             JTextField temp = jField.get("E_" + K);
                             temp.setText(jf.getText());
-                            temp.setBackground(Color.yellow);
+                            temp.setBackground(Color.green);
                             index = "" + K;
                             tQty = tQty + Integer.parseInt(jf.getText());
                             Dashboard.setNumber(index, jf.getText(), seriesLable.getText(), subSeriesNo.getText());
@@ -3742,7 +3778,7 @@ public class Dashboard extends javax.swing.JFrame {
 
                             Map<String, String> jString = new HashMap<>();
                             JTextField temp = jField.get("E_" + p);
-                            temp.setBackground(Color.yellow);
+                            temp.setBackground(Color.green);
                             jString.put("num", p + "");
                             Gson gson = new GsonBuilder().setPrettyPrinting().create();
                             String jsonEmp = gson.toJson(jString);
@@ -3755,7 +3791,7 @@ public class Dashboard extends javax.swing.JFrame {
                             while (so <= myResponse.length()) {
                                 JTextField temdp = jField.get("E_" + myResponse.getString("" + so));
                                 temdp.setText(jf.getText());
-                                temdp.setBackground(Color.yellow);
+                                temdp.setBackground(Color.green);
                                 Dashboard.setNumber(myResponse.getString("" + so), temdp.getText(), seriesLable.getText(), subSeriesNo.getText());
                                 so++;
                             }
@@ -3767,7 +3803,7 @@ public class Dashboard extends javax.swing.JFrame {
                     default:
                         index = "" + p;
                         JTextField temp = jField.get("E_" + p);
-                        temp.setBackground(Color.yellow);
+                        temp.setBackground(Color.green);
                         Dashboard.setNumber(index, temp.getText(), seriesLable.getText(), subSeriesNo.getText());
                         break;
                 }
@@ -3805,14 +3841,18 @@ public class Dashboard extends javax.swing.JFrame {
     }
 
     public static void resetFinalTotal() {
-        for (int i = 1000; i <= 10990; i = i + 1000) {
-            int t = i + 900;
-            //System.out.println("Q" + i + "_" + t);
-            JTextField tm = totalField.get("Q" + i + "_" + t);
-            tm.setText("");
-            tm = totalField.get("A" + i + "_" + t);
-            tm.setText("");
+        try {
+            for (int i = 1000; i <= 10990; i = i + 1000) {
+                int t = i + 900;
+                //System.out.println("Q" + i + "_" + t);
+                JTextField tm = totalField.get("Q" + i + "_" + t);
+                tm.setText("");
+                tm = totalField.get("A" + i + "_" + t);
+                tm.setText("");
 
+            }
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
         }
 
     }
@@ -3968,9 +4008,9 @@ public class Dashboard extends javax.swing.JFrame {
             ArrayList<Map> wPoint = singleResult.singleResultJSONPrint(Data);
 
             int ip = 0;
-            int x = 10;
+            int x = 8;
             int y = 5;
-            int a = 79;
+            int a = 67;
             int b = 29;
 
             String ColorArray[] = new String[]{"212,133,194", "130,180,126", "122,180,232", "91,163,106", "217,141,129", "185,177,230", "234,158,123", "164,204,90", "201,189,175", "23,188,189"};
@@ -3996,7 +4036,7 @@ public class Dashboard extends javax.swing.JFrame {
                         //System.out.println("" + fl);
                         JLabel jLable = new JLabel("" + fl);
                         jLable.setBounds(x, y, a, b);
-                        jLable.setFont(new java.awt.Font("Monospaced", 1, 30)); // NOI18N
+                        jLable.setFont(new java.awt.Font("Monospaced", 1, 25)); // NOI18N
                         String col[] = ColorArray[ks].split(",");
                         //System.out.println(ColorArray[ks]);
                         jLable.setOpaque(true);
@@ -4008,10 +4048,10 @@ public class Dashboard extends javax.swing.JFrame {
 
                         if (ip == 9) {
                             y = 30 + y;
-                            x = 10;
+                            x = 8;
                             ip = -1;
                         } else {
-                            x = 80 + x;
+                            x = 68 + x;
                             //break;
                         }
                         ip++;

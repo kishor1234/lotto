@@ -49,8 +49,8 @@ public class invoiceJSON {
             for (int i = 0; i < ja.size(); i++) {
                 Map<String, String> printMap = ja.get(i);
                 printPage += "Rajashreee Lottery\n";
-                printPage += "Draw ID:" + printMap.get("gametimeid") + "\t\t Draw Time:" + printMap.get("gameendtime") + "\n\n";
-                printPage += "Num\tqty\tNum\tqty\tNum\tqty\t\n";
+                printPage += "Draw ID:" + printMap.get("gametimeid") + "     Draw Time:" + printMap.get("gameendtime") + "\n\n";
+                printPage += "Num  qty  Num  qty  Num  qty  \n";
                 Map<String, ArrayList> printMapd = ja.get(0);
                 ArrayList<Map> point = printMapd.get("point");
                 int k = 1;
@@ -59,10 +59,10 @@ public class invoiceJSON {
 
                     for (Map.Entry<String, String> finas : dPoint.entrySet()) {
                         if (k == 3) {
-                            printPage += "" + finas.getKey() + "\t" + finas.getValue() + "\n";
+                            printPage += "" + finas.getKey() + "  " + finas.getValue() + "\n";
                             k = 0;
                         } else {
-                            printPage += "" + finas.getKey() + "\t" + finas.getValue() + "\t";
+                            printPage += "" + finas.getKey() + "  " + finas.getValue() + "  ";
                         }
                         k++;
                     //printPage+="Num\tqty\tNum\tqty\tNum\tqty\t";

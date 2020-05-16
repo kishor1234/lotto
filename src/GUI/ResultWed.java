@@ -9,6 +9,7 @@ package GUI;
  *
  * @author asksoft
  */
+import api.httpAPI;
 import com.sun.javafx.application.PlatformImpl;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -17,6 +18,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Group;
@@ -39,6 +41,7 @@ public class ResultWed extends JPanel {
     private WebView browser;
     private JFXPanel jfxPanel;
     private JButton swingButton;
+    private JButton closeButton;
     private WebEngine webEngine;
     private final static JFrame frame = new JFrame();
 
@@ -56,7 +59,7 @@ public class ResultWed extends JPanel {
                 frame.getContentPane().add(new ResultWed());
 
                 Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-                frame.setMinimumSize(new Dimension(940, 680));
+                frame.setMinimumSize(new Dimension(800, 580));
                 frame.setLocation(dim.width / 2 - frame.getSize().width / 2, dim.height / 2 - frame.getSize().height / 2);
 
                 frame.setUndecorated(true);
@@ -72,7 +75,7 @@ public class ResultWed extends JPanel {
             frame.getContentPane().add(new ResultWed());
             //frame.pack();
             Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-            frame.setMinimumSize(new Dimension(940, 680));
+            frame.setMinimumSize(new Dimension(800, 580));
             frame.setLocation(dim.width / 2 - frame.getSize().width / 2, dim.height / 2 - frame.getSize().height / 2);
 
             frame.setUndecorated(true);
@@ -98,19 +101,31 @@ public class ResultWed extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                frame.setVisible(false);
-//                Platform.runLater(new Runnable() {
-//
-//                    @Override
-//                    public void run() {
-//                        webEngine.reload();
-//                    }
-//                });
+                
+                Platform.runLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        webEngine.reload();
+                    }
+                });
             }
         });
-        swingButton.setText("Close");
+        swingButton.setText("Reload");
 
-        add(swingButton, BorderLayout.SOUTH);
+        add(swingButton, BorderLayout.NORTH);
+        
+        closeButton = new JButton();
+        closeButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.setVisible(false);
+//                
+            }
+        });
+        closeButton.setText("Close");
+        add(closeButton, BorderLayout.SOUTH);
     }
 
     /**
@@ -146,7 +161,7 @@ public class ResultWed extends JPanel {
                 LocalDateTime now = LocalDateTime.now();
                 //System.out.println(dtf.format(now));
                 String gdate = dtf.format(now);
-                String url = "http://newloto.lcl/?r=result&userid=" + userid + "&series=" + series + "&gdate=" + gdate;
+                String url = httpAPI.api_url + "?r=result&userid=" + userid + "&series=" + series + "&gdate=" + gdate;
                 webEngine.load(url);
 
                 ObservableList<Node> children = root.getChildren();

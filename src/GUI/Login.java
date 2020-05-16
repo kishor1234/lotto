@@ -37,6 +37,7 @@ public class Login extends javax.swing.JFrame {
     public Login() {
         initComponents();
         this.setLocationRelativeTo(null);
+        loadPrinter();
 
     }
 
@@ -62,6 +63,8 @@ public class Login extends javax.swing.JFrame {
         jLabel6 = new javax.swing.JLabel();
         msg = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
+        printerPanel = new javax.swing.JPanel();
+        printer = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(170, 206, 222));
@@ -118,7 +121,7 @@ public class Login extends javax.swing.JFrame {
                 btn_loginActionPerformed(evt);
             }
         });
-        jPanel1.add(btn_login, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 200, 90, 35));
+        jPanel1.add(btn_login, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 190, 90, 35));
 
         jLabel2.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(254, 254, 254));
@@ -147,10 +150,83 @@ public class Login extends javax.swing.JFrame {
         jLabel8.setText("Software 2020 Version 1.0");
         jPanel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 330, -1, -1));
 
+        printerPanel.setBackground(new java.awt.Color(89, 81, 79));
+        printerPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+
+        printer.setForeground(new java.awt.Color(255, 255, 255));
+
+        javax.swing.GroupLayout printerPanelLayout = new javax.swing.GroupLayout(printerPanel);
+        printerPanel.setLayout(printerPanelLayout);
+        printerPanelLayout.setHorizontalGroup(
+            printerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(printer, javax.swing.GroupLayout.DEFAULT_SIZE, 136, Short.MAX_VALUE)
+        );
+        printerPanelLayout.setVerticalGroup(
+            printerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, printerPanelLayout.createSequentialGroup()
+                .addGap(0, 70, Short.MAX_VALUE)
+                .addComponent(printer, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+
+        jPanel1.add(printerPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 185, 138, 90));
+
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 640, 350));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+public void loadPrinter() {
+        try {
+            printer.setVisible(true);
+            DocFlavor flavor = DocFlavor.BYTE_ARRAY.AUTOSENSE;
+            PrintRequestAttributeSet pras = new HashPrintRequestAttributeSet();
+
+            PrintService printServices[] = PrintServiceLookup.lookupPrintServices(
+                    flavor, pras);
+            boolean flag = true;
+            int ip = 0;
+            int x = 10;
+            int y = 20;
+            int a = 100;
+            int b = 15;
+            ButtonGroup bg = new ButtonGroup();
+            for (PrintService printerService : printServices) {
+                JRadioButton jButtong = new JRadioButton(printerService.getName());
+                if (flag) {
+                    jButtong.setBounds(x, y, a, b);
+                    jButtong.setSelected(true);
+                    flag = false;
+                    printer.setText(printerService.getName());
+                } else {
+                    jButtong.setBounds(x, y, a, b);
+                }
+                jButtong.setBackground(new Color(89,81,79));
+                jButtong.setForeground(new Color(255,255,255));
+                jButtong.setText(printerService.getName());
+                jButtong.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        printer.setText(jButtong.getText());
+                    }
+                });
+                if (ip == 0) {
+                    y = 15 + y;
+                    x = 10;
+                    ip = -1;
+                } else {
+                    x = 100 + x;
+                    //break;
+                }
+                ip++;
+                bg.add(jButtong);
+                printerPanel.add(jButtong);
+
+                //System.out.println("Printer = " + printerService.getName());
+            }
+
+        } catch (Exception ex) {
+
+        }
+    }
 
     private void btn_loginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_loginActionPerformed
         // TODO add your handling code here:
@@ -162,14 +238,14 @@ public class Login extends javax.swing.JFrame {
 
         try {
             String data = httpAPI._jsonRequest("?r=gamelogin", jsonString);
-            //System.out.println(data);
+            System.out.println(data);
             JSONObject myResponse = new JSONObject(data);
             int status = Integer.parseInt(myResponse.getString("status"));
             //System.out.println(status);
             if (status == 1) {
                 msg.setText(myResponse.getString("message"));
                 this.setVisible(false);
-                new GUI.Dashboard(data).setVisible(true);
+                new GUI.Dashboard(data,printer.getText()).setVisible(true);
             } else {
                 msg.setText(myResponse.getString("message"));
                 userid.setText("");
@@ -289,6 +365,8 @@ public class Login extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel msg;
     private javax.swing.JPasswordField password;
+    public static javax.swing.JLabel printer;
+    private javax.swing.JPanel printerPanel;
     private javax.swing.JTextField userid;
     // End of variables declaration//GEN-END:variables
 }
